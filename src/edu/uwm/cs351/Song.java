@@ -1,12 +1,11 @@
 package edu.uwm.cs351;
 
-import java.awt.Color;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
+import edu.uwm.cs351.Note;
 import junit.framework.TestCase;
 
 // This is a Homework Assignment for CS 351 at UWM
@@ -30,14 +29,24 @@ import junit.framework.TestCase;
  * You should use a version stamp to implement <i>fail-fast</i> semantics
  * for the iterator.
  */
-public class BallCollection extends AbstractCollection<Ball> implements Collection<Ball>, Iterable<Ball>{
+public class Song extends AbstractCollection<Note> implements Collection<Note>, Iterable<Note>{
 
-	int _count, _version;
-	Ball[] _data;
-
-	private static final int INITIAL_CAPACITY = 1;
 	
-	private BallCollection(boolean ignored) {} // DO NOT CHANGE THIS
+
+	/** Static Constants */
+	private static final String DEFAULT_NAME = "Untitled";
+	private static final int DEFAULT_BPM = 60;
+	private static final int INITIAL_CAPACITY = 1;
+	public static final int MIN_BPM = 20, MAX_BPM = 1000;
+	
+	/** Fields */
+	private String _name;
+	private int _bpm;
+	private int _count;
+	private int _version;
+	Note[] _data;
+	
+	private Song(boolean ignored) {} // DO NOT CHANGE THIS
 
 	private boolean _report(String s) {
 		System.out.println(s);
@@ -59,25 +68,53 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 	/**
 	 * Instantiates a new ball collection.
 	 */
-	public BallCollection() {
-		// #(
-		_data = new Ball[INITIAL_CAPACITY];
+	public Song() {
+		this(DEFAULT_NAME, DEFAULT_BPM);
+	}
+
+	/**
+	 * Initialize an empty song with a specified name and bpm, an initial
+	 * capacity of INITIAL_CAPACITY. The {@link #insert(Note)} method works
+	 * efficiently (without needing more memory) until this capacity is reached.
+	 * @param name
+	 *   the name of this song, must not be null
+	 * @param bpm
+	 *   the beats per minute of this song, must be in the range [MIN_BPM,MAX_BPM]
+	 * @postcondition
+	 *   This song is empty, has specified name and bpm, and has an initial
+	 *   capacity of INITIAL_CAPACITY.
+	 * @throws IllegalArgumentException
+	 *    If the name is null, or the bpm is out of the legal range.
+	 * @exception OutOfMemoryError
+	 *   Indicates insufficient memory for an array with this many elements.
+	 *   new Note[initialCapacity].
+	 **/   
+	public Song(String name, int bpm)
+	{
+		if (name == null)
+			throw new IllegalArgumentException("Name shoud not be null");
+		if (bpm < MIN_BPM || bpm > MAX_BPM)
+			throw new IllegalArgumentException("BPM out of legal range [" + MIN_BPM + "," + MAX_BPM + "]: " + bpm);
+		
+		this._name = name;
+		this._bpm = bpm;
+		
+		// NB: We don't have to check invariant at beginning of constructor. Why?
+		// TODO: implement constructor
+		// TODO: assert _wellFormed() after body
+		//#(
+		_data = new Note[INITIAL_CAPACITY];
 		_count = 0;
 		_version++;
-		assert _wellFormed() : "invariant broken at constructor";
-		// #)
-		// NB: We don't have to check invariant at beginning of constructor. Why?
-		
-		// TODO: implement constructor
-		
-		// TODO: assert _wellFormed() after body
+		assert _wellFormed() : "invariant failed at end of constructor";
+		//#)
 	}
 	
 	private void ensureCapacity(int minimumCapacity)
 	{
 		if (_data.length >= minimumCapacity) return;
 		int newCapacity = Math.max(_data.length*2+1, minimumCapacity);
-		Ball[] newData = new Ball[newCapacity];
+		Note[] newData = new Note[newCapacity];
 		for (int i=0; i < _count; i++) 
 			newData[i] = _data[i];
 		
@@ -91,11 +128,11 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 	 * 	   because we have extended AbstractCollection with type parameter <Ball>.
 	 */
 	@Override
-	public boolean add(Ball b){
+	public boolean add(Note n){
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of add()";
 		ensureCapacity(_count+1);
-		_data[_count++] = b;
+		_data[_count++] = n;
 		_version++;
 		assert _wellFormed() : "invariant broken at end of add()";
 		return true;
@@ -116,7 +153,7 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		assert _wellFormed() : "invariant broken at beginning of clear()";
 		_count=0;
 		_version++;
-		_data = new Ball[INITIAL_CAPACITY];
+		_data = new Note[INITIAL_CAPACITY];
 		assert _wellFormed() : "invariant broken at end of clear()";
 		// #)
 		// TODO: assert wellFormed() before body
@@ -146,7 +183,7 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 	 * @see java.util.AbstractCollection#iterator()
 	 */
 	@Override
-	public Iterator<Ball> iterator() {
+	public Iterator<Note> iterator() {
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of iterator()";
 		return new MyIterator();
@@ -158,7 +195,7 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		// NB: We don't have to check invariant at end of iterator(). Why?
 	}
 	
-	private class MyIterator implements Iterator<Ball> {
+	private class MyIterator implements Iterator<Note> {
 		
 		int _myVersion, _currentIndex;
 		boolean _calledNext;
@@ -180,7 +217,7 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 			
 			// #(
 			// 0.
-			if (!BallCollection.this._wellFormed()) return _report("outer invariant broken while iterating");
+			if (!Song.this._wellFormed()) return _report("outer invariant broken while iterating");
 			if (_myVersion == _version) {
 				// 1.
 				if (_currentIndex<-1 || _currentIndex>=_count) return _report("_currentIndex holds illegal value.");
@@ -231,12 +268,12 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		 * @throws NoSuchElementException if the iteration has no more elements
 		 */
 		@Override
-		public Ball next() {
+		public Note next() {
 			assert _wellFormed() : "invariant fails at beginning of iterator next()";
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
-			Ball cur = _data[++_currentIndex];
+			Note cur = _data[++_currentIndex];
 			_calledNext=true;
 			// #)
 			// TODO
@@ -276,19 +313,102 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		}
 	}
 	
+	/**
+	 * Gets the name of the song
+	 * @return the name
+	 */
+	public String getName() {
+		assert _wellFormed() : "invariant failed at start of getName";
+		return _name;
+	}
+
+	/**
+	 * Gets the beats per minute of the song.
+	 * @return the bpm
+	 */
+	public int getBPM() {
+		assert _wellFormed() : "invariant failed at start of getBPM";
+		return _bpm;
+	}
+
+	/**
+	 * Gets the total duration of the song by adding duration of all its notes.
+	 * @return the total duration
+	 */
+	public double getDuration() {
+		assert _wellFormed() : "invariant failed at start of getDuration";
+		double result = 0;
+		for (int i = 0; i < _count; i++)
+			result += _data[i].getDuration();
+		return result;
+	}
+	
+	/**
+	 * Sets the name of the song.
+	 * @param newName the new name, must not be null
+	 */
+	public void setName(String newName) {
+		assert _wellFormed() : "invariant failed at start of setName";
+		if (newName == null) throw new IllegalArgumentException("name cannot be null");
+		_name = newName;
+		assert _wellFormed() : "invariant failed at end of setName";
+	}
+
+	/**
+	 * Sets the beats per minute (BPM) of the song.
+	 * @param newBPM the new bpm
+	 * @throws IllegalArgumentException in the new BPM is not in the range [MIN_BPM,MAX_BPM]
+	 */
+	public void setBPM(int newBPM) {
+		assert _wellFormed() : "invariant failed at start of setBPM";
+		if (newBPM < MIN_BPM || newBPM > MAX_BPM) throw new IllegalArgumentException("BPM out of legal range [" + MIN_BPM + "," + MAX_BPM + "]: " +  newBPM);
+		_bpm = newBPM;
+		assert _wellFormed() : "invariant failed at end of setBPM";
+	}
+	
+	/**
+	 * Sretches the song by the given factor, lengthening or shortening its duration
+	 *
+	 * @param factor the factor to multiply each note's duration by
+	 * @throws IllegalArgumentException if song is transposed where a note's duration
+	 * 				is beyond the valid bounds
+	 */
+	public void stretch(double factor) {
+		assert _wellFormed() : "invariant failed at start of stretch";
+		for (int i = 0; i < _count; i++)
+			_data[i] = _data[i].stretch(factor);
+		// TODO stretch each note in the song
+		assert _wellFormed() : "invariant failed at end of stretch";
+	}
+
+
+	/**
+	 * Transposes the song by the given interval, raising or lowering its pitch
+	 *
+	 * @param interval the interval to transpose each note in the song
+	 * @throws IllegalArgumentException if song is transposed where a note is beyond the bounds
+	 * 									of valid MIDI pitch values [0,127]
+	 */
+	public void transpose(int interval) {
+		assert _wellFormed() : "invariant failed at start of transpose";
+		for (int i = 0; i < _count; i++)
+			_data[i] = _data[i].transpose(interval);
+		assert _wellFormed() : "invariant failed at end of transpose";
+	}
+	
 	public static class TestInvariant extends TestCase {
 		
-		protected BallCollection self;
-		protected BallCollection.MyIterator iterator;
+		protected Song self;
+		protected Song.MyIterator iterator;
 		
-		private Ball b1 = new Ball(new Point(1,1), new Vector(1,1), Color.BLACK);
-		private Ball b2 = new Ball(new Point(2,2), new Vector(2,2), Color.WHITE);
-		private Ball b3 = new Ball(new Point(3,3), new Vector(3,3), Color.RED);
-		private Ball b4 = new Ball(new Point(4,4), new Vector(4,4), Color.GREEN);
+		private Note n1 = new Note("c4", 0.5);
+		private Note n2 = new Note("e4", 0.25);
+		private Note n3 = new Note("g4", 0.25);
+		private Note n4 = new Note("c5", 2.0);
 		
 		@Override
 		protected void setUp() {
-			self = new BallCollection(false);
+			self = new Song(false);
 			iterator = self.new MyIterator(false);
 		}
 		
@@ -299,48 +419,48 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		
 		//outer invariant 2
 		public void testNull() {
-			self._data = new Ball[2];
+			self._data = new Note[2];
 			assertTrue(self._wellFormed());
 			self._count = 2;
 			self._data[0] = null;
-			self._data[1] = b1;
+			self._data[1] = n1;
 			assertFalse("null element",self._wellFormed());
 			self._count = 0;
-			assertTrue("good empty list of length 2",self._wellFormed());
+			assertTrue("good empty collection of length 2",self._wellFormed());
 		}
 		
 		//outer invariants 1, 2
 		public void testCountOff() {
-			self._data = new Ball[4];
+			self._data = new Note[4];
 			self._count = 1;
 			assertFalse("count is wrong",self._wellFormed());
 			self._count = 0;
-			self._data[0] = b1;
-			self._data[1] = b2;
-			assertTrue("good empty list",self._wellFormed());
+			self._data[0] = n1;
+			self._data[1] = n2;
+			assertTrue("good empty collection",self._wellFormed());
 			self._count = 1;
-			assertTrue("good one element list",self._wellFormed());
+			assertTrue("good one element collection",self._wellFormed());
 			self._count = 3;
-			self._data[3] = b3;
+			self._data[3] = n3;
 			assertFalse("count off",self._wellFormed());
 			++self._count;
 			assertFalse("null element",self._wellFormed());
-			self._data[2] = b4;
-			assertTrue("good four element list",self._wellFormed());
+			self._data[2] = n4;
+			assertTrue("good four element collection",self._wellFormed());
 			++self._count;
 			assertFalse("_count of 5 in _data array of length 4",self._wellFormed());
 		}
 		
 		//inner invariant 0
 		public void testThroughIterator() {
-			self._data = new Ball[2];
+			self._data = new Note[2];
 			self._count = 2;
 			assertFalse("outer wrong",iterator._wellFormed());
 		}
 		
 		//iterator invariant 1, 2, invariant only enforced if versions match
 		public void testEmptyIterator() {
-			self._data = new Ball[2];
+			self._data = new Note[2];
 			iterator._currentIndex = -10;
 			assertFalse("_currentIndex too small",iterator._wellFormed());
 			iterator._currentIndex = 2;
@@ -356,10 +476,10 @@ public class BallCollection extends AbstractCollection<Ball> implements Collecti
 		
 		//iterator invariant 1, 2, invariant only enforced if versions match
 		public void testIterator() {
-			self._data = new Ball[10];
+			self._data = new Note[10];
 			self._version += 456;
-			self._data[0] = b1;
-			self._data[1] = b2;
+			self._data[0] = n1;
+			self._data[1] = n2;
 			self._count = 2;
 			assertTrue(self._wellFormed());
 			assertTrue(iterator._wellFormed());
