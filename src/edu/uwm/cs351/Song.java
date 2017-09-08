@@ -136,12 +136,13 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		_version++;
 		assert _wellFormed() : "invariant broken at end of add()";
 		return true;
-		// #)
+		/* #)
 		// TODO: assert wellFormed() before body
 		
 		// TODO: implement add(Note b)
 		
 		// TODO: assert _wellFormed() after body
+		*/
 	}
 	
 	/*
@@ -258,7 +259,6 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			return (_currentIndex<_count-1);
 			/* #)
 			//TODO
-			return false;
 			## */
 		}
 
@@ -283,9 +283,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assert _wellFormed() : "invariant fails at end of iterator next()";
 			// #(
 			return cur;
-			/* #)
-			return null
-			## */
+			// #)
 		}
 
 		/**
