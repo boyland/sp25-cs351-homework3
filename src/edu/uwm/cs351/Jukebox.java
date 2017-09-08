@@ -1,12 +1,16 @@
 package edu.uwm.cs351;
 import javax.sound.midi.*;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -17,13 +21,15 @@ import java.util.Scanner;
 public class Jukebox implements MetaEventListener {
 
 	/** Static Constants */
-    private static final int TICKS_PER_QUARTER_NOTE = 4; // each tick is a 16th note
-    public static final int END_OF_TRACK_MESSAGE = 47;
+    private static final int TICKS_PER_QUARTER_NOTE = 256;
+    private static final int END_OF_TRACK_MESSAGE = 47;
+    private static final double NEUTRAL_FACTOR = 1.0;
+    private static final int NEUTRAL_INTERVAL = 0;
 
     /** GUI fields */
     private JFrame frame;
     private JMenuBar bar;
-    private JMenu songMenu, instrumentMenu;
+    private JMenu songMenu, instrumentMenu, stretchMenu, transposeMenu;
     private JProgressBar progressBar;
     private Timer progressUpdate;
     private JButton togglePlayback;
@@ -32,6 +38,10 @@ public class Jukebox implements MetaEventListener {
     private Synthesizer synthesizer;
     private Sequencer sequencer;
     private float bpm;
+    private Song song;
+    private double factor = NEUTRAL_FACTOR;
+    private int interval = NEUTRAL_INTERVAL;
+    
     
     /**
      * Instantiates a new Jukebox.
@@ -70,9 +80,12 @@ public class Jukebox implements MetaEventListener {
   		bar = new JMenuBar();
     	readySongs();
     	readyInstruments();
+    	readyTransposeMenu();
+    	readyStretchMenu();
   		
   		progressBar = new JProgressBar();
   		progressBar.setPreferredSize(new Dimension(300,20));
+  		progressBar.setStringPainted(true);
   		togglePlayback = new JButton("Play");
   		togglePlayback.addActionListener( event -> togglePlayback());
   		togglePlayback.setEnabled(false);
@@ -94,6 +107,8 @@ public class Jukebox implements MetaEventListener {
   	  		sequencer.setTempoInBPM(bpm);
   	  		
   	  		songMenu.setEnabled(false);
+  	  		stretchMenu.setEnabled(false);
+	  		transposeMenu.setEnabled(false);
   	  		togglePlayback.setText("Stop");
   	  		progressUpdate.start();
   		}
@@ -101,6 +116,8 @@ public class Jukebox implements MetaEventListener {
   	  		sequencer.stop();
   	  		progressUpdate.stop();
   	  		songMenu.setEnabled(true);
+  	  		stretchMenu.setEnabled(true);
+  	  		transposeMenu.setEnabled(true);
   	  		togglePlayback.setText("Play");
   		}
   	}
@@ -114,33 +131,117 @@ public class Jukebox implements MetaEventListener {
   		for (final File songFile : new File("./songs").listFiles()) {
   			Song song = read(songFile);
   			JMenuItem menuItem = new JMenuItem(song.getName());
-  			menuItem.addActionListener( event -> loadSong(song));
+  			menuItem.addActionListener( event -> {
+  				this.song = song;
+  				this.factor = NEUTRAL_FACTOR;
+  				this.interval = NEUTRAL_INTERVAL;
+  				loadSong();
+  			});
   			songMenu.add(menuItem);
   		}
   		bar.add(songMenu);
 	}
+	  
+	  /**
+	   * Prepare the stretch menu and slider.
+	   */
+	  private void readyStretchMenu(){
+		stretchMenu = new JMenu("Stretch");
+		// Start at 0 to keep ticks aligned, adjust to 0.1 upon event
+		JSlider stretchSlider = new JSlider(JSlider.VERTICAL, 5, 40, 10);
+		Hashtable<Integer, JLabel> tickLabels = new Hashtable<>();
+		tickLabels.put(new Integer(5), new JLabel("1/2 "));
+		tickLabels.put(new Integer(10), new JLabel("1"));
+		tickLabels.put(new Integer(20), new JLabel("2"));
+		tickLabels.put(new Integer(30), new JLabel("3"));
+		tickLabels.put(new Integer(40), new JLabel("4"));
+		stretchSlider.setLabelTable(tickLabels);
+		stretchSlider.setPaintLabels(true);
+		// stretchSlider.setMinorTickSpacing(5);
+		stretchSlider.setMajorTickSpacing(5);
+		stretchSlider.setPaintTicks(true);
+		stretchSlider.setInverted(true);
+	    stretchMenu.add(stretchSlider);
+	    stretchMenu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuCanceled(MenuEvent e) {
+				factor = Math.max(0.5, stretchSlider.getValue() / 10.0);
+				loadSong();
+			}
+			@Override
+			public void menuDeselected(MenuEvent e) {
+				factor = Math.max(0.5, stretchSlider.getValue() / 10.0);
+				loadSong();
+			}
+			@Override
+			public void menuSelected(MenuEvent e) {}
+		});
+	    stretchMenu.setEnabled(false);
+	    bar.add(stretchMenu);
+	  }
+	  
+	  /**
+	   * Prepare the transpose menu and slider.
+	   */
+	  private void readyTransposeMenu(){
+		transposeMenu = new JMenu("Transpose");
+		JSlider transposeSlider = new JSlider(JSlider.VERTICAL, -24, 24, 0);
+		transposeSlider.setPaintLabels(true);
+		transposeSlider.setMinorTickSpacing(4);
+		transposeSlider.setMajorTickSpacing(12);
+		transposeSlider.setPaintTicks(true);
+		transposeMenu.add(transposeSlider);
+		transposeMenu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuCanceled(MenuEvent e) {
+				interval = transposeSlider.getValue();
+				loadSong();
+			}
+			@Override
+			public void menuDeselected(MenuEvent e) {
+				interval = transposeSlider.getValue();
+				loadSong();
+			}
+			@Override
+			public void menuSelected(MenuEvent e) {}
+		});
+		transposeMenu.setEnabled(false);
+	    bar.add(transposeMenu);
+	  }
   	
   	/**
 	   * Loads the given Song into the Sequencer by first converting the song into a Sequence.
 	   *
 	   * @param song the song to load into the Sequencer
 	   */
-	  private void loadSong(Song song) {
-		  
-		// For fun, try transposing the song here!
-		  
+	  private void loadSong() {
         try {
-            Sequence sequence = convert(song);
+        	Song toLoad = song.clone();
+        	String barLabel = toLoad.getName();
+        	
+        	if (interval != NEUTRAL_INTERVAL) {
+        		toLoad.transpose(interval);
+        		barLabel += "( " + ((interval > NEUTRAL_INTERVAL) ? "+" : "") + interval + " )";
+        	}
+        		
+        	if (factor != NEUTRAL_FACTOR) {
+        		toLoad.stretch(factor);
+        		barLabel += " x "+factor;
+        	}
+            
+        	progressBar.setString(barLabel);
             progressBar.setValue(0);
             progressBar.setMaximum(toTicks(song.getDuration()));
-            progressBar.setStringPainted(true);
-            progressBar.setString(song.getName());
+            Sequence sequence = convert(toLoad);
             sequencer.setSequence(sequence);
-            bpm = song.getBPM();
+            bpm = toLoad.getBPM();
             togglePlayback.setEnabled(true);
+            stretchMenu.setEnabled(true);
+            transposeMenu.setEnabled(true);
         }
-        catch (InvalidMidiDataException e) {
-        	System.out.println("Unable to convert song: "+song.getName());
+        catch (Exception e) {
+        	e.printStackTrace();
+        	System.exit(1);
         }
     }
   	
@@ -152,10 +253,6 @@ public class Jukebox implements MetaEventListener {
 	   */
 	  private Song read(File file) {
   		Song song = null;
-  		
-  			
-  		
-  		
   		try (Scanner s = new Scanner(file)) {
   			String name = s.nextLine().trim();
   			float bpm = Integer.parseInt(s.nextLine().trim().split(" ")[0]);

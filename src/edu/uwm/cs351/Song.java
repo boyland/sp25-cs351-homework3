@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  * You should use a version stamp to implement <i>fail-fast</i> semantics
  * for the iterator.
  */
-public class Song extends AbstractCollection<Note> implements Collection<Note>, Iterable<Note>{
+public class Song extends AbstractCollection<Note> implements Collection<Note>, Iterable<Note>, Cloneable{
 
 	
 
@@ -367,7 +367,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	}
 	
 	/**
-	 * Sretches the song by the given factor, lengthening or shortening its duration
+	 * Stretches the song by the given factor, lengthening or shortening its duration
 	 *
 	 * @param factor the factor to multiply each note's duration by
 	 * @throws IllegalArgumentException if song is transposed where a note's duration
@@ -394,6 +394,41 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		for (int i = 0; i < _count; i++)
 			_data[i] = _data[i].transpose(interval);
 		assert _wellFormed() : "invariant failed at end of transpose";
+	}
+	
+	/**
+	 * Generate a copy of this song.
+	 * @param - none
+	 * @return
+	 *   The return value is a copy of this song. Subsequent changes to the
+	 *   copy will not affect the original, nor vice versa.
+	 * @exception OutOfMemoryError
+	 *   Indicates insufficient memory for creating the clone.
+	 **/ 
+	public Song clone( ) { 
+		assert _wellFormed() : "invariant failed at start of clone";
+		Song result;
+
+		try
+		{
+			result = (Song) super.clone( );
+		}
+		catch (CloneNotSupportedException e)
+		{  // This exception should not occur. But if it does, it would probably
+			// indicate a programming error that made super.clone unavailable.
+			// The most common error would be forgetting the "Implements Cloneable"
+			// clause at the start of this class.
+			throw new RuntimeException
+			("This class does not implement Cloneable");
+		}
+
+		// all that is needed is to clone the data array.
+		// (Exercise: Why is this needed?)
+		result._data = _data.clone( );
+
+		assert _wellFormed() : "invariant failed at end of clone";
+		assert result._wellFormed() : "invariant on result failed at end of clone";
+		return result;
 	}
 	
 	public static class TestInvariant extends TestCase {
