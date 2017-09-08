@@ -37,7 +37,6 @@ public class Jukebox implements MetaEventListener {
     /** MIDI fields */
     private Synthesizer synthesizer;
     private Sequencer sequencer;
-    private float bpm;
     private Song song;
     private double factor = NEUTRAL_FACTOR;
     private int interval = NEUTRAL_INTERVAL;
@@ -75,8 +74,7 @@ public class Jukebox implements MetaEventListener {
   	private void createGUI(){
   		frame = new JFrame("MIDI Jukebox");
   		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-  		frame.setLocationRelativeTo(null);
-
+  		
   		bar = new JMenuBar();
     	readySongs();
     	readyInstruments();
@@ -95,6 +93,7 @@ public class Jukebox implements MetaEventListener {
   		frame.add(togglePlayback);
   		frame.setJMenuBar(bar);
   		frame.pack();
+  		frame.setLocationRelativeTo(null);
   		frame.setVisible(true);
   	}
   	
@@ -104,7 +103,7 @@ public class Jukebox implements MetaEventListener {
 	  private void togglePlayback() {
   		if (togglePlayback.getText().equals("Play")) {
   	  		sequencer.start();
-  	  		sequencer.setTempoInBPM(bpm);
+  	  		sequencer.setTempoInBPM(song.getBPM());
   	  		
   	  		songMenu.setEnabled(false);
   	  		stretchMenu.setEnabled(false);
@@ -147,30 +146,29 @@ public class Jukebox implements MetaEventListener {
 	   */
 	  private void readyStretchMenu(){
 		stretchMenu = new JMenu("Stretch");
-		// Start at 0 to keep ticks aligned, adjust to 0.1 upon event
-		JSlider stretchSlider = new JSlider(JSlider.VERTICAL, 5, 40, 10);
+		JSlider stretchSlider = new JSlider(JSlider.VERTICAL, 25, 400, 100);
 		Hashtable<Integer, JLabel> tickLabels = new Hashtable<>();
-		tickLabels.put(new Integer(5), new JLabel("1/2 "));
-		tickLabels.put(new Integer(10), new JLabel("1"));
-		tickLabels.put(new Integer(20), new JLabel("2"));
-		tickLabels.put(new Integer(30), new JLabel("3"));
-		tickLabels.put(new Integer(40), new JLabel("4"));
+		tickLabels.put(new Integer(25), new JLabel("1/4 "));
+		tickLabels.put(new Integer(50), new JLabel("1/2 "));
+		tickLabels.put(new Integer(100), new JLabel("1"));
+		tickLabels.put(new Integer(200), new JLabel("2"));
+		tickLabels.put(new Integer(300), new JLabel("3"));
+		tickLabels.put(new Integer(400), new JLabel("4"));
 		stretchSlider.setLabelTable(tickLabels);
 		stretchSlider.setPaintLabels(true);
-		// stretchSlider.setMinorTickSpacing(5);
-		stretchSlider.setMajorTickSpacing(5);
+		stretchSlider.setMajorTickSpacing(25);
 		stretchSlider.setPaintTicks(true);
 		stretchSlider.setInverted(true);
 	    stretchMenu.add(stretchSlider);
 	    stretchMenu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuCanceled(MenuEvent e) {
-				factor = Math.max(0.5, stretchSlider.getValue() / 10.0);
+				factor = Math.max(0.25, stretchSlider.getValue() / 100.0);
 				loadSong();
 			}
 			@Override
 			public void menuDeselected(MenuEvent e) {
-				factor = Math.max(0.5, stretchSlider.getValue() / 10.0);
+				factor = Math.max(0.25, stretchSlider.getValue() / 100.0);
 				loadSong();
 			}
 			@Override
@@ -231,10 +229,9 @@ public class Jukebox implements MetaEventListener {
             
         	progressBar.setString(barLabel);
             progressBar.setValue(0);
-            progressBar.setMaximum(toTicks(song.getDuration()));
+            progressBar.setMaximum(toTicks(toLoad.getDuration()));
             Sequence sequence = convert(toLoad);
             sequencer.setSequence(sequence);
-            bpm = toLoad.getBPM();
             togglePlayback.setEnabled(true);
             stretchMenu.setEnabled(true);
             transposeMenu.setEnabled(true);
@@ -346,7 +343,7 @@ public class Jukebox implements MetaEventListener {
                 timestamp += toTicks(note.getDuration());
     		}
 	  	 	/* #)
-	  	 	// TODO: Change to use Song's new Collection API.
+	  	 	// TODO: Change to use Song's new iterator.
 	  	 	for (song.start(); song.hasCurrent(); song.advance()) {
             	Note note = song.getCurrent();
             	putNote(track, note, timestamp);

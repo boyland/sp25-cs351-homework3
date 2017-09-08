@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 /**
  * An array implementation of the Java Collection interface
  * We use java.util.AbstractCollection to implement most methods.
- * You should override clear() for efficiency, and add(Ball)
+ * You should override clear() for efficiency, and add(Note)
  * for functionality.  You will also be required to override the abstract methods
  * count() and iterator().  All these methods should be declared "@Override".
  * 
@@ -31,17 +31,17 @@ import junit.framework.TestCase;
  */
 public class Song extends AbstractCollection<Note> implements Collection<Note>, Iterable<Note>, Cloneable{
 
-	
-
 	/** Static Constants */
 	private static final String DEFAULT_NAME = "Untitled";
+	private static final int MIN_BPM = 20, MAX_BPM = 1000;
 	private static final int DEFAULT_BPM = 60;
 	private static final int INITIAL_CAPACITY = 1;
-	public static final int MIN_BPM = 20, MAX_BPM = 1000;
-	
-	/** Fields */
+
+	/** Song Fields */
 	private String _name;
 	private int _bpm;
+	
+	/** Collection Fields */
 	private int _count;
 	private int _version;
 	Note[] _data;
@@ -57,7 +57,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	private boolean _wellFormed() {
 		// 0. _data is not null
 		if(_data == null) return _report("_data is null");
-		// 1. count is a valid index of _data
+		// 1. _count is a valid index of _data
 		if(_data.length < _count) return _report("count is incorrect");
 		// 2. elements in _data indices [0, _count-1] are non-null
 		for(int i=0; i<_count; i++)
@@ -66,31 +66,32 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	}
 	
 	/**
-	 * Instantiates a new ball collection.
+	 * Initialize an empty Song using default values for name and BPM.
 	 */
 	public Song() {
 		this(DEFAULT_NAME, DEFAULT_BPM);
 	}
 
 	/**
-	 * Initialize an empty song with a specified name and bpm, an initial
+	 * Initialize an empty song with a specified name and BPM and an initial
 	 * capacity of INITIAL_CAPACITY. The {@link #insert(Note)} method works
 	 * efficiently (without needing more memory) until this capacity is reached.
 	 * @param name
 	 *   the name of this song, must not be null
 	 * @param bpm
-	 *   the beats per minute of this song, must be in the range [MIN_BPM,MAX_BPM]
+	 *   the beats per minute of this song, must be in the range [MIN_BPM, MAX_BPM]
 	 * @postcondition
 	 *   This song is empty, has specified name and bpm, and has an initial
 	 *   capacity of INITIAL_CAPACITY.
 	 * @throws IllegalArgumentException
-	 *    If the name is null, or the bpm is out of the legal range.
+	 *    If the name is null, or the BPM is outside of the legal range.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for an array with this many elements.
 	 *   new Note[initialCapacity].
 	 **/   
 	public Song(String name, int bpm)
 	{
+		// NB: We don't have to check invariant at beginning of constructor. Why?
 		if (name == null)
 			throw new IllegalArgumentException("Name shoud not be null");
 		if (bpm < MIN_BPM || bpm > MAX_BPM)
@@ -99,8 +100,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		this._name = name;
 		this._bpm = bpm;
 		
-		// NB: We don't have to check invariant at beginning of constructor. Why?
-		// TODO: implement constructor
+		// TODO: implement rest of constructor
 		// TODO: assert _wellFormed() after body
 		//#(
 		_data = new Note[INITIAL_CAPACITY];
@@ -124,8 +124,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 
 	/*
 	 * @see java.util.AbstractCollection#add(java.lang.Object)
-	 * NB: We are able to parameterize this method with Ball instead of Object
-	 * 	   because we have extended AbstractCollection with type parameter <Ball>.
+	 * NB: We are able to parameterize this method with Note instead of Object
+	 * 	   because we have extended AbstractCollection with type parameter <Note>.
 	 */
 	@Override
 	public boolean add(Note n){
@@ -139,7 +139,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// #)
 		// TODO: assert wellFormed() before body
 		
-		// TODO: implement add(Ball b)
+		// TODO: implement add(Note b)
 		
 		// TODO: assert _wellFormed() after body
 	}
@@ -208,7 +208,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			// NB: Don't check 1,2 unless the version matches.
 
 			// 0. The outer invariant holds
-			//		NB: 
+			//		NB: To access the parent Song of this iterator, use "Song.this"
+			//			e.g. Song.this.getName()
 			// TODO
 			// 1. _currentIndex is between -1 (inclusive) and _count (exclusive)
 			// TODO
@@ -217,7 +218,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			
 			// #(
 			// 0.
-			if (!Song.this._wellFormed()) return _report("outer invariant broken while iterating");
+			if (!Song.this._wellFormed()) return _report("outer invariant broken during iteration");
 			if (_myVersion == _version) {
 				// 1.
 				if (_currentIndex<-1 || _currentIndex>=_count) return _report("_currentIndex holds illegal value.");
@@ -255,8 +256,10 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			return (_currentIndex<_count-1);
-			// #)
+			/* #)
 			//TODO
+			return false;
+			## */
 		}
 
 		/**
@@ -280,7 +283,9 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assert _wellFormed() : "invariant fails at end of iterator next()";
 			// #(
 			return cur;
-			// #)
+			/* #)
+			return null
+			## */
 		}
 
 		/**
@@ -309,12 +314,11 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			// #)
 			//TODO
 			assert _wellFormed() : "invariant fails at end of iterator remove()";
-			
 		}
 	}
 	
 	/**
-	 * Gets the name of the song
+	 * Gets the name of the song.
 	 * @return the name
 	 */
 	public String getName() {
@@ -324,7 +328,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 
 	/**
 	 * Gets the beats per minute of the song.
-	 * @return the bpm
+	 * @return the BPM
 	 */
 	public int getBPM() {
 		assert _wellFormed() : "invariant failed at start of getBPM";
@@ -349,14 +353,14 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	 */
 	public void setName(String newName) {
 		assert _wellFormed() : "invariant failed at start of setName";
-		if (newName == null) throw new IllegalArgumentException("name cannot be null");
+		if (newName == null) throw new IllegalArgumentException("new name cannot be null");
 		_name = newName;
 		assert _wellFormed() : "invariant failed at end of setName";
 	}
 
 	/**
 	 * Sets the beats per minute (BPM) of the song.
-	 * @param newBPM the new bpm
+	 * @param newBPM the new BPM
 	 * @throws IllegalArgumentException in the new BPM is not in the range [MIN_BPM,MAX_BPM]
 	 */
 	public void setBPM(int newBPM) {
@@ -367,7 +371,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	}
 	
 	/**
-	 * Stretches the song by the given factor, lengthening or shortening its duration
+	 * Stretches the song by the given factor, lengthening or shortening its duration.
 	 *
 	 * @param factor the factor to multiply each note's duration by
 	 * @throws IllegalArgumentException if song is transposed where a note's duration
@@ -377,7 +381,6 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		assert _wellFormed() : "invariant failed at start of stretch";
 		for (int i = 0; i < _count; i++)
 			_data[i] = _data[i].stretch(factor);
-		// TODO stretch each note in the song
 		assert _wellFormed() : "invariant failed at end of stretch";
 	}
 
@@ -414,7 +417,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			result = (Song) super.clone( );
 		}
 		catch (CloneNotSupportedException e)
-		{  // This exception should not occur. But if it does, it would probably
+		{
+			// This exception should not occur. But if it does, it would probably
 			// indicate a programming error that made super.clone unavailable.
 			// The most common error would be forgetting the "Implements Cloneable"
 			// clause at the start of this class.
@@ -447,13 +451,13 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			iterator = self.new MyIterator(false);
 		}
 		
-		//outer invariant 0
-		public void testNullData() {
+		// outer invariant 0 - null data
+		public void test01() {
 			assertFalse("null data", self._wellFormed());
 		}
 		
-		//outer invariant 2
-		public void testNull() {
+		// outer invariant 2 - null element in count
+		public void test02() {
 			self._data = new Note[2];
 			assertTrue(self._wellFormed());
 			self._count = 2;
@@ -464,8 +468,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assertTrue("good empty collection of length 2",self._wellFormed());
 		}
 		
-		//outer invariants 1, 2
-		public void testCountOff() {
+		// outer invariants 1, 2 - count off
+		public void test03() {
 			self._data = new Note[4];
 			self._count = 1;
 			assertFalse("count is wrong",self._wellFormed());
@@ -486,22 +490,22 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assertFalse("_count of 5 in _data array of length 4",self._wellFormed());
 		}
 		
-		//inner invariant 0
-		public void testThroughIterator() {
+		// inner invariant 0 - outer invariant broken
+		public void test04() {
 			self._data = new Note[2];
 			self._count = 2;
-			assertFalse("outer wrong",iterator._wellFormed());
+			assertFalse("outer invariant should fail",iterator._wellFormed());
 		}
 		
-		//iterator invariant 1, 2, invariant only enforced if versions match
-		public void testEmptyIterator() {
+		// iterator invariant 1, 2, invariant only enforced if versions match
+		public void test05() {
 			self._data = new Note[2];
 			iterator._currentIndex = -10;
 			assertFalse("_currentIndex too small",iterator._wellFormed());
 			iterator._currentIndex = 2;
 			assertFalse("_currentIndex too big",iterator._wellFormed());
 			++self._version;
-			assertTrue("version bad",iterator._wellFormed());
+			assertTrue("versions don't match",iterator._wellFormed());
 			iterator._currentIndex = -1;
 			++iterator._myVersion;
 			assertTrue("current OK",iterator._wellFormed());
@@ -509,8 +513,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assertFalse("cannot remove -1",iterator._wellFormed());
 		}
 		
-		//iterator invariant 1, 2, invariant only enforced if versions match
-		public void testIterator() {
+		// iterator invariant 1, 2, invariant only enforced if versions match
+		public void test06() {
 			self._data = new Note[10];
 			self._version += 456;
 			self._data[0] = n1;
