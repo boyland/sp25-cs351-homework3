@@ -490,5 +490,16 @@ public class TestSong extends LockedTestCase {
 		}
 		
 	}
+	
+	public void test24() {
+		s1.add(null);
+		s1.add(n1);
+		it = s1.iterator();
+		assertTrue(it.hasNext());
+		assertNull(it.next());
+		assertTrue(it.hasNext());
+		assertEquals(n1,it.next());
+		assertFalse(it.hasNext());
+	}
 
 }

@@ -48,8 +48,10 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	
 	private Song(boolean ignored) {} // DO NOT CHANGE THIS
 
+	private static boolean doReport = true; // only to be changed in JUnit test code
+	
 	private boolean _report(String s) {
-		System.out.println(s);
+		if (doReport) System.out.println(s);
 		return false;
 	}
 	
@@ -58,10 +60,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// 0. _data is not null
 		if(_data == null) return _report("_data is null");
 		// 1. _count is a valid index of _data
-		if(_data.length < _count) return _report("count is incorrect");
-		// 2. elements in _data indices [0, _count-1] are non-null
-		for(int i=0; i<_count; i++)
-			if(_data[i] == null) return _report("index "+i+" contains null");
+		if(_count < 0 || _data.length < _count) return _report("count is incorrect");
 		return true;
 	}
 	
@@ -446,6 +445,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		protected void setUp() {
 			self = new Song(false);
 			iterator = self.new MyIterator(false);
+			doReport = false;
 		}
 		
 		// outer invariant 0 - null data
@@ -457,10 +457,12 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		public void test02() {
 			self._data = new Note[2];
 			assertTrue(self._wellFormed());
+			self._count = -1;
+			assertFalse(self._wellFormed());
 			self._count = 2;
 			self._data[0] = null;
 			self._data[1] = n1;
-			assertFalse("null element",self._wellFormed());
+			assertTrue("null element OK",self._wellFormed());
 			self._count = 0;
 			assertTrue("good empty collection of length 2",self._wellFormed());
 		}
@@ -469,7 +471,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		public void test03() {
 			self._data = new Note[4];
 			self._count = 1;
-			assertFalse("count is wrong",self._wellFormed());
+			assertTrue("count is OK",self._wellFormed());
 			self._count = 0;
 			self._data[0] = n1;
 			self._data[1] = n2;
@@ -478,9 +480,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			assertTrue("good one element collection",self._wellFormed());
 			self._count = 3;
 			self._data[3] = n3;
-			assertFalse("count off",self._wellFormed());
 			++self._count;
-			assertFalse("null element",self._wellFormed());
 			self._data[2] = n4;
 			assertTrue("good four element collection",self._wellFormed());
 			++self._count;
@@ -490,7 +490,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// inner invariant 0 - outer invariant broken
 		public void test04() {
 			self._data = new Note[2];
-			self._count = 2;
+			self._count = -1;
 			assertFalse("outer invariant should fail",iterator._wellFormed());
 		}
 		
