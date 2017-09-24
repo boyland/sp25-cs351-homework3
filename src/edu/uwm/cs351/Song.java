@@ -15,7 +15,7 @@ import junit.framework.TestCase;
  * We use java.util.AbstractCollection to implement most methods.
  * You should override clear() for efficiency, and add(Note)
  * for functionality.  You will also be required to override the abstract methods
- * count() and iterator().  All these methods should be declared "@Override".
+ * size() and iterator().  All these methods should be declared "@Override".
  * 
  * The data structure is a dynamic sized array.
  * The fields should be:
@@ -44,7 +44,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	/** Collection Fields */
 	private int _count;
 	private int _version;
-	Note[] _data;
+	private Note[] _data;
 	
 	private Song(boolean ignored) {} // DO NOT CHANGE THIS
 
