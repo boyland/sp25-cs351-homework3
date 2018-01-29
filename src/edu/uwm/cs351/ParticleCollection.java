@@ -169,7 +169,7 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 	private class MyIterator implements Iterator<Particle> {
 		
 		int _myVersion, _currentIndex;
-		boolean _calledNext;
+		boolean _isCurrent;
 
 		MyIterator(boolean ignored) {} // DO NOT CHANGE THIS
 		
@@ -182,9 +182,9 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			//		NB: To access the parent ParticleCollection of this iterator, use "ParticleCollection.this"
 			//			e.g. ParticleCollection.this.getName()
 			// TODO
-			// 1. _currentIndex is between -1 (inclusive) and _count (exclusive)
+			// 1. _currentIndex is between 0 (inclusive) and _count (inclusive)
 			// TODO
-			// 2. _calledNext is true only if _currentIndex is not -1
+			// 2. _currentIndex is equal to _count only if _isCurrent is false
 			// TODO
 			
 			// #(
@@ -192,9 +192,9 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			if (!ParticleCollection.this._wellFormed()) return _report("outer invariant broken during iteration");
 			if (_myVersion == _version) {
 				// 1.
-				if (_currentIndex<-1 || _currentIndex>=_count) return _report("_currentIndex holds illegal value.");
+				if (_currentIndex<0 || _currentIndex>_count) return _report("_currentIndex holds illegal value.");
 				// 2.
-				if (_calledNext && _currentIndex==-1) return _report("_calledNext is true but _currentIndex is -1");
+				if (_isCurrent && _currentIndex==_count) return _report("_isCurrent is true but _currentIndex is _count");
 			}
 			// #)
 			return true;
@@ -206,8 +206,8 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		public MyIterator() {
 			// #(
 			_myVersion = _version;
-			_currentIndex=-1;
-			_calledNext = false;
+			_currentIndex=0;
+			_isCurrent = false;
 			// #)
 			// TODO
 			assert _wellFormed() : "invariant fails in iterator constructor";
@@ -226,7 +226,7 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			assert _wellFormed() : "invariant fails at beginning of iterator hasNext()";
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
-			return (_currentIndex<_count-1);
+			return (!_isCurrent && _currentIndex<_count-1);
 			/* #)
 			//TODO
 			## */
@@ -246,8 +246,9 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
-			Particle cur = _data[++_currentIndex];
-			_calledNext=true;
+			if (_isCurrent) ++_currentIndex;
+			Particle cur = _data[_currentIndex];
+			_isCurrent=true;
 			// #)
 			// TODO
 			assert _wellFormed() : "invariant fails at end of iterator next()";
@@ -269,16 +270,13 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			assert _wellFormed() : "invariant fails at beginning of iterator remove()";
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
-			if (_calledNext && _currentIndex != -1){
-				for (int i = _currentIndex; i < _count - 1; i++)
-					_data[i]=_data[i+1];
-				_count--;
-				_currentIndex--;
-			}
-			else {throw new IllegalStateException();}
+			if (!_isCurrent) throw new IllegalStateException("nothing to remove");
+			for (int i = _currentIndex; i < _count - 1; i++)
+				_data[i]=_data[i+1];
+			_count--;
+			_isCurrent = false;
 			_myVersion++;
 			_version++;
-			_calledNext=false;
 			// #)
 			//TODO
 			assert _wellFormed() : "invariant fails at end of iterator remove()";
@@ -389,15 +387,15 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			self._data = new Particle[2];
 			iterator._currentIndex = -10;
 			assertFalse("_currentIndex too small",iterator._wellFormed());
-			iterator._currentIndex = 2;
+			iterator._currentIndex = 1;
 			assertFalse("_currentIndex too big",iterator._wellFormed());
 			++self._version;
 			assertTrue("versions don't match",iterator._wellFormed());
-			iterator._currentIndex = -1;
+			iterator._currentIndex = 0;
 			++iterator._myVersion;
 			assertTrue("current OK",iterator._wellFormed());
-			iterator._calledNext = true;
-			assertFalse("cannot remove -1",iterator._wellFormed());
+			iterator._isCurrent = true;
+			assertFalse("cannot have current when after end",iterator._wellFormed());
 		}
 		
 		// iterator invariant 1, 2, invariant only enforced if versions match
@@ -410,13 +408,13 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			assertTrue(self._wellFormed());
 			assertTrue(iterator._wellFormed());
 			iterator._myVersion = 456;
-			iterator._currentIndex = -1;
-			assertTrue(iterator._wellFormed());
 			iterator._currentIndex = 0;
 			assertTrue(iterator._wellFormed());
-			iterator._calledNext = true;
+			iterator._currentIndex = 1;
 			assertTrue(iterator._wellFormed());
-			iterator._currentIndex = 3;
+			iterator._isCurrent = true;
+			assertTrue(iterator._wellFormed());
+			iterator._currentIndex = 2;
 			assertFalse("currentIndex out of bounds",iterator._wellFormed());
 			++iterator._myVersion;
 			assertTrue(iterator._wellFormed());
