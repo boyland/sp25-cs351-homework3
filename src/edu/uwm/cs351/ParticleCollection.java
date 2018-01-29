@@ -7,7 +7,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import edu.uwm.cs351.Particle;
 import junit.framework.TestCase;
 
 // This is a Homework Assignment for CS 351 at UWM
@@ -34,15 +33,8 @@ import junit.framework.TestCase;
 public class ParticleCollection extends AbstractCollection<Particle> implements Collection<Particle>, Iterable<Particle>, Cloneable{
 
 	/** Static Constants */
-	private static final String DEFAULT_NAME = "Untitled";
-	private static final int MIN_BPM = 20, MAX_BPM = 1000;
-	private static final int DEFAULT_BPM = 60;
 	private static final int INITIAL_CAPACITY = 1;
 
-	/** ParticleCollection Fields */
-	private String _name;
-	private int _bpm;
-	
 	/** Collection Fields */
 	private int _count;
 	private int _version;
@@ -67,41 +59,19 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 	}
 	
 	/**
-	 * Initialize an empty ParticleCollection using default values for name and BPM.
-	 */
-	public ParticleCollection() {
-		this(DEFAULT_NAME, DEFAULT_BPM);
-	}
-
-	/**
-	 * Initialize an empty song with a specified name and BPM and an initial
-	 * capacity of INITIAL_CAPACITY. The {@link #insert(Particle)} method works
+	 * Initialize an empty particle collection with an initial
+	 * capacity of INITIAL_CAPACITY. The {@link #add(Particle)} method works
 	 * efficiently (without needing more memory) until this capacity is reached.
-	 * @param name
-	 *   the name of this song, must not be null
-	 * @param bpm
-	 *   the beats per minute of this song, must be in the range [MIN_BPM, MAX_BPM]
 	 * @postcondition
-	 *   This song is empty, has specified name and bpm, and has an initial
+	 *   This particle collection is empty, has an initial
 	 *   capacity of INITIAL_CAPACITY.
-	 * @throws IllegalArgumentException
-	 *    If the name is null, or the BPM is outside of the legal range.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for an array with this many elements.
 	 *   new Particle[initialCapacity].
 	 **/   
-	public ParticleCollection(String name, int bpm)
+	public ParticleCollection()
 	{
-		// NB: We don't have to check invariant at beginning of constructor. Why?
-		if (name == null)
-			throw new IllegalArgumentException("Name shoud not be null");
-		if (bpm < MIN_BPM || bpm > MAX_BPM)
-			throw new IllegalArgumentException("BPM out of legal range [" + MIN_BPM + "," + MAX_BPM + "]: " + bpm);
-		
-		this._name = name;
-		this._bpm = bpm;
-		
-		// TODO: implement rest of constructor
+		// TODO: implement constructor
 		// TODO: assert _wellFormed() after body
 		//#(
 		_data = new Particle[INITIAL_CAPACITY];
@@ -316,10 +286,10 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 	}
 	
 	/**
-	 * Generate a copy of this song.
+	 * Generate a copy of this particle collection.
 	 * @param - none
 	 * @return
-	 *   The return value is a copy of this song. Subsequent changes to the
+	 *   The return value is a copy of this particle collection. Subsequent changes to the
 	 *   copy will not affect the original, nor vice versa.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.

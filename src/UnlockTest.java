@@ -2,7 +2,7 @@ import edu.uwm.cs.junit.LockedTestCase;
 
 public class UnlockTest {
 	public static void main(String[] args){
-		unlock("TestSong");
+		unlock("TestParticleCollection");
 	}
 	
 	private static void unlock(String classname){

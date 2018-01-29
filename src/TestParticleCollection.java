@@ -9,7 +9,7 @@ import edu.uwm.cs351.ParticleCollection;
 import edu.uwm.cs351.Point;
 import edu.uwm.cs351.Vector;
 
-public class TestSong extends LockedTestCase {
+public class TestParticleCollection extends LockedTestCase {
 	
 	private ParticleCollection s1, s2;
 	private Iterator<Particle> it, it2;
