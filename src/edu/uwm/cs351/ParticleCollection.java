@@ -1,11 +1,13 @@
 package edu.uwm.cs351;
 
+import java.awt.Color;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import edu.uwm.cs351.Note;
+
+import edu.uwm.cs351.Particle;
 import junit.framework.TestCase;
 
 // This is a Homework Assignment for CS 351 at UWM
@@ -13,7 +15,7 @@ import junit.framework.TestCase;
 /**
  * An array implementation of the Java Collection interface
  * We use java.util.AbstractCollection to implement most methods.
- * You should override clear() for efficiency, and add(Note)
+ * You should override clear() for efficiency, and add(Particle)
  * for functionality.  You will also be required to override the abstract methods
  * size() and iterator().  All these methods should be declared "@Override".
  * 
@@ -29,7 +31,7 @@ import junit.framework.TestCase;
  * You should use a version stamp to implement <i>fail-fast</i> semantics
  * for the iterator.
  */
-public class Song extends AbstractCollection<Note> implements Collection<Note>, Iterable<Note>, Cloneable{
+public class ParticleCollection extends AbstractCollection<Particle> implements Collection<Particle>, Iterable<Particle>, Cloneable{
 
 	/** Static Constants */
 	private static final String DEFAULT_NAME = "Untitled";
@@ -37,16 +39,16 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	private static final int DEFAULT_BPM = 60;
 	private static final int INITIAL_CAPACITY = 1;
 
-	/** Song Fields */
+	/** ParticleCollection Fields */
 	private String _name;
 	private int _bpm;
 	
 	/** Collection Fields */
 	private int _count;
 	private int _version;
-	private Note[] _data;
+	private Particle[] _data;
 	
-	private Song(boolean ignored) {} // DO NOT CHANGE THIS
+	private ParticleCollection(boolean ignored) {} // DO NOT CHANGE THIS
 
 	private static boolean doReport = true; // only to be changed in JUnit test code
 	
@@ -65,15 +67,15 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	}
 	
 	/**
-	 * Initialize an empty Song using default values for name and BPM.
+	 * Initialize an empty ParticleCollection using default values for name and BPM.
 	 */
-	public Song() {
+	public ParticleCollection() {
 		this(DEFAULT_NAME, DEFAULT_BPM);
 	}
 
 	/**
 	 * Initialize an empty song with a specified name and BPM and an initial
-	 * capacity of INITIAL_CAPACITY. The {@link #insert(Note)} method works
+	 * capacity of INITIAL_CAPACITY. The {@link #insert(Particle)} method works
 	 * efficiently (without needing more memory) until this capacity is reached.
 	 * @param name
 	 *   the name of this song, must not be null
@@ -86,9 +88,9 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	 *    If the name is null, or the BPM is outside of the legal range.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for an array with this many elements.
-	 *   new Note[initialCapacity].
+	 *   new Particle[initialCapacity].
 	 **/   
-	public Song(String name, int bpm)
+	public ParticleCollection(String name, int bpm)
 	{
 		// NB: We don't have to check invariant at beginning of constructor. Why?
 		if (name == null)
@@ -102,7 +104,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// TODO: implement rest of constructor
 		// TODO: assert _wellFormed() after body
 		//#(
-		_data = new Note[INITIAL_CAPACITY];
+		_data = new Particle[INITIAL_CAPACITY];
 		_count = 0;
 		_version++;
 		assert _wellFormed() : "invariant failed at end of constructor";
@@ -113,7 +115,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	{
 		if (_data.length >= minimumCapacity) return;
 		int newCapacity = Math.max(_data.length*2+1, minimumCapacity);
-		Note[] newData = new Note[newCapacity];
+		Particle[] newData = new Particle[newCapacity];
 		for (int i=0; i < _count; i++) 
 			newData[i] = _data[i];
 		
@@ -123,11 +125,11 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 
 	/*
 	 * @see java.util.AbstractCollection#add(java.lang.Object)
-	 * NB: We are able to parameterize this method with Note instead of Object
-	 * 	   because we have extended AbstractCollection with type parameter <Note>.
+	 * NB: We are able to parameterize this method with Particle instead of Object
+	 * 	   because we have extended AbstractCollection with type parameter <Particle>.
 	 */
 	@Override
-	public boolean add(Note n){
+	public boolean add(Particle n){
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of add()";
 		ensureCapacity(_count+1);
@@ -138,7 +140,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// #)
 		// TODO: assert wellFormed() before body
 		
-		// TODO: implement add(Note b)
+		// TODO: implement add(Particle b)
 		
 		// TODO: assert _wellFormed() after body
 	}
@@ -152,7 +154,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		assert _wellFormed() : "invariant broken at beginning of clear()";
 		_count=0;
 		_version++;
-		_data = new Note[INITIAL_CAPACITY];
+		_data = new Particle[INITIAL_CAPACITY];
 		assert _wellFormed() : "invariant broken at end of clear()";
 		// #)
 		// TODO: assert wellFormed() before body
@@ -182,7 +184,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	 * @see java.util.AbstractCollection#iterator()
 	 */
 	@Override
-	public Iterator<Note> iterator() {
+	public Iterator<Particle> iterator() {
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of iterator()";
 		return new MyIterator();
@@ -194,7 +196,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		// NB: We don't have to check invariant at end of iterator(). Why?
 	}
 	
-	private class MyIterator implements Iterator<Note> {
+	private class MyIterator implements Iterator<Particle> {
 		
 		int _myVersion, _currentIndex;
 		boolean _calledNext;
@@ -207,8 +209,8 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			// NB: Don't check 1,2 unless the version matches.
 
 			// 0. The outer invariant holds
-			//		NB: To access the parent Song of this iterator, use "Song.this"
-			//			e.g. Song.this.getName()
+			//		NB: To access the parent ParticleCollection of this iterator, use "ParticleCollection.this"
+			//			e.g. ParticleCollection.this.getName()
 			// TODO
 			// 1. _currentIndex is between -1 (inclusive) and _count (exclusive)
 			// TODO
@@ -217,7 +219,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 			
 			// #(
 			// 0.
-			if (!Song.this._wellFormed()) return _report("outer invariant broken during iteration");
+			if (!ParticleCollection.this._wellFormed()) return _report("outer invariant broken during iteration");
 			if (_myVersion == _version) {
 				// 1.
 				if (_currentIndex<-1 || _currentIndex>=_count) return _report("_currentIndex holds illegal value.");
@@ -269,12 +271,12 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		 * @throws NoSuchElementException if the iteration has no more elements
 		 */
 		@Override
-		public Note next() {
+		public Particle next() {
 			assert _wellFormed() : "invariant fails at beginning of iterator next()";
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
-			Note cur = _data[++_currentIndex];
+			Particle cur = _data[++_currentIndex];
 			_calledNext=true;
 			// #)
 			// TODO
@@ -314,88 +316,6 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	}
 	
 	/**
-	 * Gets the name of the song.
-	 * @return the name
-	 */
-	public String getName() {
-		assert _wellFormed() : "invariant failed at start of getName";
-		return _name;
-	}
-
-	/**
-	 * Gets the beats per minute of the song.
-	 * @return the BPM
-	 */
-	public int getBPM() {
-		assert _wellFormed() : "invariant failed at start of getBPM";
-		return _bpm;
-	}
-
-	/**
-	 * Gets the total duration of the song by adding duration of all its notes.
-	 * @return the total duration
-	 */
-	public double getDuration() {
-		assert _wellFormed() : "invariant failed at start of getDuration";
-		double result = 0;
-		for (int i = 0; i < _count; i++)
-			result += _data[i].getDuration();
-		return result;
-	}
-	
-	/**
-	 * Sets the name of the song.
-	 * @param newName the new name, must not be null
-	 */
-	public void setName(String newName) {
-		assert _wellFormed() : "invariant failed at start of setName";
-		if (newName == null) throw new IllegalArgumentException("new name cannot be null");
-		_name = newName;
-		assert _wellFormed() : "invariant failed at end of setName";
-	}
-
-	/**
-	 * Sets the beats per minute (BPM) of the song.
-	 * @param newBPM the new BPM
-	 * @throws IllegalArgumentException in the new BPM is not in the range [MIN_BPM,MAX_BPM]
-	 */
-	public void setBPM(int newBPM) {
-		assert _wellFormed() : "invariant failed at start of setBPM";
-		if (newBPM < MIN_BPM || newBPM > MAX_BPM) throw new IllegalArgumentException("BPM out of legal range [" + MIN_BPM + "," + MAX_BPM + "]: " +  newBPM);
-		_bpm = newBPM;
-		assert _wellFormed() : "invariant failed at end of setBPM";
-	}
-	
-	/**
-	 * Stretches the song by the given factor, lengthening or shortening its duration.
-	 *
-	 * @param factor the factor to multiply each note's duration by
-	 * @throws IllegalArgumentException if song is transposed where a note's duration
-	 * 				is beyond the valid bounds
-	 */
-	public void stretch(double factor) {
-		assert _wellFormed() : "invariant failed at start of stretch";
-		for (int i = 0; i < _count; i++)
-			_data[i] = _data[i].stretch(factor);
-		assert _wellFormed() : "invariant failed at end of stretch";
-	}
-
-
-	/**
-	 * Transposes the song by the given interval, raising or lowering its pitch
-	 *
-	 * @param interval the interval to transpose each note in the song
-	 * @throws IllegalArgumentException if song is transposed where a note is beyond the bounds
-	 * 									of valid MIDI pitch values [0,127]
-	 */
-	public void transpose(int interval) {
-		assert _wellFormed() : "invariant failed at start of transpose";
-		for (int i = 0; i < _count; i++)
-			_data[i] = _data[i].transpose(interval);
-		assert _wellFormed() : "invariant failed at end of transpose";
-	}
-	
-	/**
 	 * Generate a copy of this song.
 	 * @param - none
 	 * @return
@@ -404,13 +324,13 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.
 	 **/ 
-	public Song clone( ) { 
+	public ParticleCollection clone( ) { 
 		assert _wellFormed() : "invariant failed at start of clone";
-		Song result;
+		ParticleCollection result;
 
 		try
 		{
-			result = (Song) super.clone( );
+			result = (ParticleCollection) super.clone( );
 		}
 		catch (CloneNotSupportedException e)
 		{
@@ -433,17 +353,17 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 	
 	public static class TestInvariant extends TestCase {
 		
-		protected Song self;
-		protected Song.MyIterator iterator;
+		protected ParticleCollection self;
+		protected ParticleCollection.MyIterator iterator;
 		
-		private Note n1 = new Note("c4", 0.5);
-		private Note n2 = new Note("e4", 0.25);
-		private Note n3 = new Note("g4", 0.25);
-		private Note n4 = new Note("c5", 2.0);
+		private Particle n1 = new Particle(new Point(1,1),new Vector(1,1), 1, Color.BLUE);
+		private Particle n2 = new Particle(new Point(2,2),new Vector(2,2), 2, Color.RED);;
+		private Particle n3 = new Particle(new Point(3,3),new Vector(3,3), 3, Color.CYAN);
+		private Particle n4 = new Particle(new Point(4,4),new Vector(4,4), 4, Color.GREEN);
 		
 		@Override
 		protected void setUp() {
-			self = new Song(false);
+			self = new ParticleCollection(false);
 			iterator = self.new MyIterator(false);
 			doReport = false;
 		}
@@ -455,7 +375,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		
 		// outer invariant 2 - null element in count
 		public void test02() {
-			self._data = new Note[2];
+			self._data = new Particle[2];
 			assertTrue(self._wellFormed());
 			self._count = -1;
 			assertFalse(self._wellFormed());
@@ -469,7 +389,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		
 		// outer invariants 1, 2 - count off
 		public void test03() {
-			self._data = new Note[4];
+			self._data = new Particle[4];
 			self._count = 1;
 			assertTrue("count is OK",self._wellFormed());
 			self._count = 0;
@@ -489,14 +409,14 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		
 		// inner invariant 0 - outer invariant broken
 		public void test04() {
-			self._data = new Note[2];
+			self._data = new Particle[2];
 			self._count = -1;
 			assertFalse("outer invariant should fail",iterator._wellFormed());
 		}
 		
 		// iterator invariant 1, 2, invariant only enforced if versions match
 		public void test05() {
-			self._data = new Note[2];
+			self._data = new Particle[2];
 			iterator._currentIndex = -10;
 			assertFalse("_currentIndex too small",iterator._wellFormed());
 			iterator._currentIndex = 2;
@@ -512,7 +432,7 @@ public class Song extends AbstractCollection<Note> implements Collection<Note>, 
 		
 		// iterator invariant 1, 2, invariant only enforced if versions match
 		public void test06() {
-			self._data = new Note[10];
+			self._data = new Particle[10];
 			self._version += 456;
 			self._data[0] = n1;
 			self._data[1] = n2;

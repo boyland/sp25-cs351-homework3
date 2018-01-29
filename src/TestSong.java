@@ -1,20 +1,24 @@
+import java.awt.Color;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
 import edu.uwm.cs.junit.LockedTestCase;
-import edu.uwm.cs351.Note;
-import edu.uwm.cs351.Song;
+import edu.uwm.cs351.Particle;
+import edu.uwm.cs351.ParticleCollection;
+import edu.uwm.cs351.Point;
+import edu.uwm.cs351.Vector;
 
 public class TestSong extends LockedTestCase {
 	
-	private Song s1, s2;
-	private Iterator<Note> it, it2;
+	private ParticleCollection s1, s2;
+	private Iterator<Particle> it, it2;
 	
-	private Note n1 = new Note("c4", 0.5);
-	private Note n2 = new Note("e4", 0.25);
-	private Note n3 = new Note("g4", 0.25);
-	private Note n4 = new Note("c5", 2.0);
-	private Note n5 = new Note(128, 1.0);
+	private Particle n1 = new Particle(new Point(1,1), new Vector(1,1), 1, Color.RED);
+	private Particle n2 = new Particle(new Point(2,2), new Vector(2,2), 2, Color.ORANGE);
+	private Particle n3 = new Particle(new Point(3,3), new Vector(3,3), 3, Color.YELLOW);
+	private Particle n4 = new Particle(new Point(4,4), new Vector(4,4), 4, Color.GREEN);
+	private Particle n5 = new Particle(new Point(5,5), new Vector(5,5), 5 , Color.BLUE);
 	
 	@Override
 	protected void setUp() {
@@ -24,22 +28,22 @@ public class TestSong extends LockedTestCase {
 		} catch (NullPointerException ex) {
 			assertTrue(true);
 		}
-		s1 = new Song();
-		s2 = new Song();
+		s1 = new ParticleCollection();
+		s2 = new ParticleCollection();
 	}
 	
-	// Convert a Note result to a string
-	Note notes[] = { null, n1, n2, n3, n4, n5 };
-	private String getName(Note b) {
-		for (int i=1; i<notes.length;i++)
-			if (notes[i] == b)
+	// Convert a Particle result to a string
+	Particle particles[] = { null, n1, n2, n3, n4, n5 };
+	private String getName(Particle b) {
+		for (int i=1; i<particles.length;i++)
+			if (particles[i] == b)
 				return "n" + i;
 		return "null";}
 	
-	protected void testCollection(Song col, String name, Note... parts)
+	protected void testCollection(ParticleCollection col, String name, Particle... parts)
 	{
 		assertEquals(name + ".size()",parts.length,col.size());
-		Iterator<Note> it = col.iterator();
+		Iterator<Particle> it = col.iterator();
 		int i=0;
 		while (it.hasNext() && i < parts.length) {
 			assertEquals(name + "[" + i + "]",parts[i],it.next());
@@ -56,7 +60,7 @@ public class TestSong extends LockedTestCase {
 		s1.add(n1);
 		it = s1.iterator();
 		assertEquals(Tb(50269584), it.hasNext());
-		assertEquals("Which note should be next?", Ts(276645695), getName(it.next()));
+		assertEquals("Which particle should be next?", Ts(276645695), getName(it.next()));
 		assertEquals(Tb(568761500), it.hasNext());
 	
 		s1.add(n2);
@@ -88,7 +92,7 @@ public class TestSong extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(Tb(1048892551), it.hasNext());
-		assertEquals("Which note should be next?",Ts(2124211383), getName(it.next()));
+		assertEquals("Which particle should be next?",Ts(2124211383), getName(it.next()));
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n1,n2} after remove(n1)",n2);
 	}
@@ -112,9 +116,9 @@ public class TestSong extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(Tb(2101852861), it.hasNext());//
-		assertEquals("Which note should be next?", Ts(654566560), getName(it.next()));//
+		assertEquals("Which particle should be next?", Ts(654566560), getName(it.next()));//
 		assertEquals(true, it.hasNext());//
-		assertEquals("Which note should be next?", "n3", getName(it.next()));//
+		assertEquals("Which particle should be next?", "n3", getName(it.next()));//
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n2,n1,n3} after remove(n2)",n1,n3);
 				
@@ -146,9 +150,9 @@ public class TestSong extends LockedTestCase {
 		assertEquals(Tb(273857373), it.hasNext());
 		it = s1.iterator();
 		assertEquals(Tb(1728770422), it.hasNext());
-		assertEquals("Which note should be next?",Ts(1849851716), getName(it.next()));
+		assertEquals("Which particle should be next?",Ts(1849851716), getName(it.next()));
 		assertEquals(true, it.hasNext());
-		assertEquals("Which note should be next?", "n2", getName(it.next()));
+		assertEquals("Which particle should be next?", "n2", getName(it.next()));
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n3,n2,n1} after remove(n1)",n3,n2);	
 	}
@@ -224,13 +228,13 @@ public class TestSong extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(true, it.hasNext());
-		assertEquals("Which note should be next?","n2",getName(it.next()));
+		assertEquals("Which particle should be next?","n2",getName(it.next()));
 		testCollection(s1,"{n1,n2,n3,n4} after remove(n1)",n2,n3,n4);
 		assertEquals(true,it.hasNext());
-		assertEquals("Which note should be next?","n3",getName(it.next()));
+		assertEquals("Which particle should be next?","n3",getName(it.next()));
 		it.remove();
 		assertEquals(true, it.hasNext());
-		assertEquals("Which note should be next?","n4",getName(it.next()));
+		assertEquals("Which particle should be next?","n4",getName(it.next()));
 		testCollection(s1,"{n1,n2,n3,n4} after remove(n1,n3)",n2,n4);
 		it.remove();
 		assertEquals(false,it.hasNext());
@@ -320,7 +324,7 @@ public class TestSong extends LockedTestCase {
 			assertTrue(("just started remove() threw wrong exception " + ex),(ex instanceof IllegalStateException));
 		}
 		assertEquals(Tb(1256896379), it.hasNext());
-		assertEquals("Which note should be next?", "n3", getName(it.next()));
+		assertEquals("Which particle should be next?", "n3", getName(it.next()));
 		testCollection(s1,"still {n3}",n3);
 	}
 	
@@ -354,7 +358,7 @@ public class TestSong extends LockedTestCase {
 			assertTrue(("remove() after remove() threw wrong exception " + ex),(ex instanceof IllegalStateException));
 		}
 		assertEquals(Tb(665890557), it.hasNext());
-		assertEquals("Which note should be next?", "n4", getName(it.next()));
+		assertEquals("Which particle should be next?", "n4", getName(it.next()));
 		testCollection(s1,"{n2,n4} after remove (n2)",n4);
 	}
 	
