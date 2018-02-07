@@ -226,7 +226,8 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			assert _wellFormed() : "invariant fails at beginning of iterator hasNext()";
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
-			return (!_isCurrent && _currentIndex<_count-1);
+			return (!_isCurrent && _currentIndex<_count ||
+					_isCurrent && _currentIndex+1 < _count);
 			/* #)
 			//TODO
 			## */
