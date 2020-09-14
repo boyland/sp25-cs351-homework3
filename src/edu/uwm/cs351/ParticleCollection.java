@@ -263,18 +263,22 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		@Override
 		public Particle next() {
 			assert _wellFormed() : "invariant fails at beginning of iterator next()";
-			Particle cur;
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
 			if (_isCurrent) ++_currentIndex;
-			cur = _data[_currentIndex];
+			Particle cur = _data[_currentIndex];
 			_isCurrent=true;
 			// #)
 			// TODO
 			assert _wellFormed() : "invariant fails at end of iterator next()";
 			// #(
 			return cur;
+			/*
+			// #)
+			return null;
+			// #(
+			 */
 			// #)
 		}
 
