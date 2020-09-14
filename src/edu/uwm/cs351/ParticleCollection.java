@@ -107,6 +107,11 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		_version++;
 		assert _wellFormed() : "invariant broken at end of add()";
 		return true;
+		/*
+		// #)
+		return false;
+		// #(
+		 */
 		// #)
 		// TODO: assert wellFormed() before body
 		
@@ -141,6 +146,11 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of size()";
 		return _count;
+		/*
+		// #)
+		return 0;
+		// #(
+		 */
 		// #)
 		// TODO: assert wellFormed() before body
 		
@@ -158,6 +168,11 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		// #(
 		assert _wellFormed() : "invariant broken at beginning of iterator()";
 		return new MyIterator();
+		/*
+		// #)
+		return null;
+		// #(
+		 */
 		// #)
 		// TODO: assert wellFormed() before body
 		
@@ -228,9 +243,13 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			return (!_isCurrent && _currentIndex<_count ||
 					_isCurrent && _currentIndex+1 < _count);
-			/* #)
+			/*
+			// #)
+			return false;
+			// #(
+			 */
+			// #)
 			//TODO
-			## */
 		}
 
 		/**
@@ -244,11 +263,12 @@ public class ParticleCollection extends AbstractCollection<Particle> implements 
 		@Override
 		public Particle next() {
 			assert _wellFormed() : "invariant fails at beginning of iterator next()";
+			Particle cur;
 			// #(
 			if (_myVersion!=_version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
 			if (_isCurrent) ++_currentIndex;
-			Particle cur = _data[_currentIndex];
+			cur = _data[_currentIndex];
 			_isCurrent=true;
 			// #)
 			// TODO
