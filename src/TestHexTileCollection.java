@@ -1,24 +1,23 @@
-import java.awt.Color;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import edu.uwm.cs.junit.LockedTestCase;
-import edu.uwm.cs351.Particle;
-import edu.uwm.cs351.ParticleCollection;
-import edu.uwm.cs351.Point;
-import edu.uwm.cs351.Vector;
+import edu.uwm.cs351.HexCoordinate;
+import edu.uwm.cs351.HexTile;
+import edu.uwm.cs351.HexTileCollection;
+import edu.uwm.cs351.Terrain;
 
-public class TestParticleCollection extends LockedTestCase {
+public class TestHexTileCollection extends LockedTestCase {
 	
-	private ParticleCollection s1, s2;
-	private Iterator<Particle> it, it2;
+	private HexTileCollection s1, s2;
+	private Iterator<HexTile> it, it2;
 	
-	private Particle n1 = new Particle(new Point(1,1), new Vector(1,1), 1, Color.RED);
-	private Particle n2 = new Particle(new Point(2,2), new Vector(2,2), 2, Color.ORANGE);
-	private Particle n3 = new Particle(new Point(3,3), new Vector(3,3), 3, Color.YELLOW);
-	private Particle n4 = new Particle(new Point(4,4), new Vector(4,4), 4, Color.GREEN);
-	private Particle n5 = new Particle(new Point(5,5), new Vector(5,5), 5 , Color.BLUE);
+	private HexTile n1 = new HexTile(Terrain.FOREST, new HexCoordinate(0,0));
+	private HexTile n2 = new HexTile(Terrain.LAND, new HexCoordinate(1,0));
+	private HexTile n3 = new HexTile(Terrain.WATER, new HexCoordinate(0,1));
+	private HexTile n4 = new HexTile(Terrain.MOUNTAIN, new HexCoordinate(1,1));
+	private HexTile n5 = new HexTile(Terrain.CITY, new HexCoordinate(0,2));
 	
 	@Override
 	protected void setUp() {
@@ -28,22 +27,22 @@ public class TestParticleCollection extends LockedTestCase {
 		} catch (NullPointerException ex) {
 			assertTrue(true);
 		}
-		s1 = new ParticleCollection();
-		s2 = new ParticleCollection();
+		s1 = new HexTileCollection();
+		s2 = new HexTileCollection();
 	}
 	
-	// Convert a Particle result to a string
-	Particle particles[] = { null, n1, n2, n3, n4, n5 };
-	private String getName(Particle b) {
-		for (int i=1; i<particles.length;i++)
-			if (particles[i] == b)
+	// Convert a HexTile result to a string
+	HexTile hexTiles[] = { null, n1, n2, n3, n4, n5 };
+	private String getName(HexTile b) {
+		for (int i=1; i<hexTiles.length;i++)
+			if (hexTiles[i] == b)
 				return "n" + i;
 		return "null";}
 	
-	protected void testCollection(ParticleCollection col, String name, Particle... parts)
+	protected void testCollection(HexTileCollection col, String name, HexTile... parts)
 	{
 		assertEquals(name + ".size()",parts.length,col.size());
-		Iterator<Particle> it = col.iterator();
+		Iterator<HexTile> it = col.iterator();
 		int i=0;
 		while (it.hasNext() && i < parts.length) {
 			assertEquals(name + "[" + i + "]",parts[i],it.next());
@@ -60,7 +59,7 @@ public class TestParticleCollection extends LockedTestCase {
 		s1.add(n1);
 		it = s1.iterator();
 		assertEquals(Tb(50269584), it.hasNext());
-		assertEquals("Which particle should be next?", Ts(276645695), getName(it.next()));
+		assertEquals("Which HexTile should be next?", Ts(276645695), getName(it.next()));
 		assertEquals(Tb(568761500), it.hasNext());
 	
 		s1.add(n2);
@@ -92,7 +91,7 @@ public class TestParticleCollection extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(Tb(1048892551), it.hasNext());
-		assertEquals("Which particle should be next?",Ts(2124211383), getName(it.next()));
+		assertEquals("Which HexTile should be next?",Ts(2124211383), getName(it.next()));
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n1,n2} after remove(n1)",n2);
 	}
@@ -116,9 +115,9 @@ public class TestParticleCollection extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(Tb(2101852861), it.hasNext());//
-		assertEquals("Which particle should be next?", Ts(654566560), getName(it.next()));//
+		assertEquals("Which HexTile should be next?", Ts(654566560), getName(it.next()));//
 		assertEquals(true, it.hasNext());//
-		assertEquals("Which particle should be next?", "n3", getName(it.next()));//
+		assertEquals("Which HexTile should be next?", "n3", getName(it.next()));//
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n2,n1,n3} after remove(n2)",n1,n3);
 				
@@ -150,9 +149,9 @@ public class TestParticleCollection extends LockedTestCase {
 		assertEquals(Tb(273857373), it.hasNext());
 		it = s1.iterator();
 		assertEquals(Tb(1728770422), it.hasNext());
-		assertEquals("Which particle should be next?",Ts(1849851716), getName(it.next()));
+		assertEquals("Which HexTile should be next?",Ts(1849851716), getName(it.next()));
 		assertEquals(true, it.hasNext());
-		assertEquals("Which particle should be next?", "n2", getName(it.next()));
+		assertEquals("Which HexTile should be next?", "n2", getName(it.next()));
 		assertEquals(false, it.hasNext());
 		testCollection(s1,"{n3,n2,n1} after remove(n1)",n3,n2);	
 	}
@@ -228,13 +227,13 @@ public class TestParticleCollection extends LockedTestCase {
 		it.next();
 		it.remove();
 		assertEquals(true, it.hasNext());
-		assertEquals("Which particle should be next?","n2",getName(it.next()));
+		assertEquals("Which HexTile should be next?","n2",getName(it.next()));
 		testCollection(s1,"{n1,n2,n3,n4} after remove(n1)",n2,n3,n4);
 		assertEquals(true,it.hasNext());
-		assertEquals("Which particle should be next?","n3",getName(it.next()));
+		assertEquals("Which HexTile should be next?","n3",getName(it.next()));
 		it.remove();
 		assertEquals(true, it.hasNext());
-		assertEquals("Which particle should be next?","n4",getName(it.next()));
+		assertEquals("Which HexTile should be next?","n4",getName(it.next()));
 		testCollection(s1,"{n1,n2,n3,n4} after remove(n1,n3)",n2,n4);
 		it.remove();
 		assertEquals(false,it.hasNext());
@@ -324,7 +323,7 @@ public class TestParticleCollection extends LockedTestCase {
 			assertTrue(("just started remove() threw wrong exception " + ex),(ex instanceof IllegalStateException));
 		}
 		assertEquals(Tb(1256896379), it.hasNext());
-		assertEquals("Which particle should be next?", "n3", getName(it.next()));
+		assertEquals("Which HexTile should be next?", "n3", getName(it.next()));
 		testCollection(s1,"still {n3}",n3);
 	}
 	
@@ -358,7 +357,7 @@ public class TestParticleCollection extends LockedTestCase {
 			assertTrue(("remove() after remove() threw wrong exception " + ex),(ex instanceof IllegalStateException));
 		}
 		assertEquals(Tb(665890557), it.hasNext());
-		assertEquals("Which particle should be next?", "n4", getName(it.next()));
+		assertEquals("Which HexTile should be next?", "n4", getName(it.next()));
 		testCollection(s1,"{n2,n4} after remove (n2)",n4);
 	}
 	
