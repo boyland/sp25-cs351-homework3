@@ -16,8 +16,8 @@ import edu.uwm.cs351.HexTile;
 /**
  * Render files of hex tiles on the screen.
  * The main program should be executed with a series of
- * files  Each file is opened in turn and the hex tiles aread from it.
- * If no files are given to the main program, it read hex tiles
+ * files.  Each file is opened in turn and the hex tiles are read from it.
+ * If no files are given to the main program, it reads hex tiles
  * from standard input.
  */
 public class Demo extends JFrame {

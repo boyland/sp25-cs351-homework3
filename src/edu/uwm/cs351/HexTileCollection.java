@@ -20,11 +20,11 @@ import junit.framework.TestCase;
  * The data structure is a dynamic sized array.
  * The fields should be:
  * <dl>
- * <dt>_data</dt> The data array.
- * <dt>_count</dt> Number of true elements in the collection.
- * <dt>_version</dt> Version number (used for fail-fast semantics)
+ * <dt>data</dt> The data array.
+ * <dt>manyItems</dt> Number of true elements in the collection.
+ * <dt>version</dt> Version number (used for fail-fast semantics)
  * </dl>
- * The class should define a private _wellFormed() method
+ * The class should define a private wellFormed() method
  * and perform assertion checks in each method.
  * You should use a version stamp to implement <i>fail-fast</i> semantics
  * for the iterator.
@@ -54,7 +54,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		// 0. data is not null
 		// 1. manyItems is a possible count of elements given the capacity of the array
 		//#(
-		if(data == null) return report("_data is null");
+		if(data == null) return report("data is null");
 		if(manyItems < 0 || data.length < manyItems) return report("manyItems is incorrect");
 		//#)
 		return true;
@@ -69,12 +69,12 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	 *   capacity of INITIAL_CAPACITY.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for an array with this many elements.
-	 *   new Particle[initialCapacity].
+	 *   new HexTile[initialCapacity].
 	 **/   
 	public HexTileCollection()
 	{
 		// TODO: implement constructor
-		// TODO: assert _wellFormed() after body
+		// TODO: assert wellFormed() after body
 		//#(
 		data = new HexTile[INITIAL_CAPACITY];
 		manyItems = 0;
@@ -117,9 +117,9 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		// #)
 		// TODO: assert wellFormed() before body
 		
-		// TODO: implement add(Particle b)
+		// TODO: implement add(HexTile b)
 		
-		// TODO: assert _wellFormed() after body
+		// TODO: assert wellFormed() after body
 	}
 	
 	/*
@@ -138,7 +138,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		
 		// TODO: implement clear()
 		
-		// TODO: assert _wellFormed() after body
+		// TODO: assert wellFormed() after body
 	}
 	
 	/*
@@ -311,10 +311,10 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	}
 	
 	/**
-	 * Generate a copy of this particle collection.
+	 * Generate a copy of this HexTile collection.
 	 * @param - none
 	 * @return
-	 *   The return value is a copy of this particle collection. Subsequent changes to the
+	 *   The return value is a copy of this HexTile collection. Subsequent changes to the
 	 *   copy will not affect the original, nor vice versa.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.
