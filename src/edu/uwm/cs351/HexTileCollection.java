@@ -206,7 +206,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			
 			// #(
 			// 0.
-			if (!HexTileCollection.this.wellFormed()) return report("outer invariant broken during iteration");
+			if (!HexTileCollection.this.wellFormed()) return false;
 			if (colVersion == version) {
 				// 1.
 				if (currentIndex<-1 || currentIndex>=manyItems) return report("currentIndex holds illegal value.");
