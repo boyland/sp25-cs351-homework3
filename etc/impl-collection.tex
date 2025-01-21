@@ -1,0 +1,412 @@
+
+%\subsection{Interfaces}
+%
+%A Java ``interface'' is a special kind of ``abstract class.''
+%A Java \emph{interface} specifies a set of (public) operations that an ADT
+%might be expected to implement.  An ADT implementation signals its
+%adherence to the interface by adding ``\texttt{implements $I$}'' 
+%to the class header, where
+%$I$ is the name of the interface.
+%
+%A Java variable (field, parameter or local) may have an interface as a
+%type.  Of course the variable is \emph{not} an instance of this type,
+%since interfaces are abstract---they don't provide any implementation.
+%Instead they are instances of some class that implements the interface.
+%In Java, it is considered better to use interfaces for the type of
+%variables or method returns instead of concrete classes since it makes
+%the program more general.
+
+%In this assignment, you will need to use
+%an interface called \verb|ActionListener| and
+%one ``generic'' interface both described later.
+
+\subsection{Collection ADT}
+
+Soon after Java was released, the need for a standardized collections
+framework became apparent.  Accordingly, Java~1.2 introduced a
+standard collections framework.  Each of the collection classes
+implements a standard set of operations.
+
+For this assignment, you will write a class that implements
+the standard Java Collection interface which has the following
+methods (in addition to ones every object has):
+\begin{description}
+    \item[size()] Return the number of elements in the collection.
+    \item[isEmpty()] Return whether the collection is empty.
+    \item[contains(Object)] Return whether the collection contains the parameter.
+    \item[iterator()] Return an iterator over the elements.
+    \item[toArray()] Return an array of all elements.
+    \item[add($E$)] Add an element to the collection and return true.
+    \item[remove(Object)] Remove an element from the collection and
+      return true, or return false if it was not found.
+    \item[containsAll(Collection)] Return true if every element in the
+      parameter is also present in this collection.
+    \item[addAll(Collection)] Add all the elements from the parameter
+      to this collection, returning true if anything was added.
+    \item[removeAll(Collection)] Remove all the elements in the parameter
+      from this collection, returning true if anything was removed.
+    \item[retainAll(Collection)] Remove all the elements in this
+      collection that do not also occur in the parameter; returning
+      true if anything was removed.
+    \item[clear()] Remove everything from the collection.
+\end{description}
+\pagebreak
+Now, as it happens, some of these operations are more fundamental than
+others.  For example, if iterators are working, it's easy to write
+\verb|contains|:
+\begin{quote}
+\begin{verbatim}
+public boolean contains(Object o) {
+    Iterator<E> e = iterator();
+    if (o==null) {
+        while (e.hasNext())
+            if (e.next()==null)
+                return true;
+    } else {
+        while (e.hasNext())
+            if (o.equals(e.next()))
+                return true;
+    }
+    return false;
+}
+\end{verbatim}
+(This code is copyright \copyright 2004 by Sun Microsystems.)
+\end{quote}
+Notice how the code calls \verb|iterator()| which is the
+(unimplemented) \verb|iterator| method in the same class.
+As it happens, if iterators are working, then many methods can be
+implemented in terms of iterators.
+
+For this reason, the Java collections framework includes
+\verb|AbstractCollection|,
+an abstract class\footnote{We assume you were taught abstract classes
+  in CS~251.}
+that does precisely this: implement
+everything using iterators, with that crucial part omitted:
+the \verb|iterator()| method is defined as ``abstract,'' that is
+unimplemented.
+
+Now \verb|size()| is also not implemented, even though it would be
+perfectly possible (albeit inefficient) to implement that method with
+iterators.  It is left abstract because presumably each collection has
+a more efficient way to keep track of the size than iterating through
+the whole collection.
+The \verb|clear| method is similar: it is easy enough to implement
+using iterators:
+\begin{quote}
+\begin{verbatim}
+public void clear() {
+    Iterator<E> e = iterator();
+    while (e.hasNext()) {
+        e.next();
+        e.remove();
+    }
+}
+\end{verbatim}
+(This code is copyright \copyright 2004 by Sun Microsystems.)
+\end{quote}
+Indeed the abstract class includes this implementation, but notes that
+a more efficient implementation should be possible.
+
+The \verb|add(...)| method is implemented in the
+\verb|AbstractCollection| class, but the implementation is not
+useful: it simply throws an exception that the operation (add) is
+``unsupported.''  Indeed, there's no way one can add an element using
+an iterator.  So, again, extenders are encouraged to override this
+method with a proper implementation.
+
+%\subsection{Generics}
+
+%A \emph{generic} class has type parameters enclosed in angle brackets,
+%for example \verb|class ArrayList<T>|; here $T$ is the only generic
+%type parameter.  Inside the body of the class $T$ can be used as a
+%regular type.  When the class is used, you need to instantiate it with
+%an actual type parameter, for instance \verb|String| or
+%\verb|Poset|.  
+%There is a problem with writing generic classes containing arrays --
+%Java does not allow creating generic arrays directly, \ie, 
+%\verb|T[] data = new T[10]| is a compiler error.
+%In this assignment, we provide a private helper method
+%\verb|makeArray(int)| to create arrays of generic type.
+
+\subsection{Iterators}
+An iterator is an object that enables a programmer 
+to traverse a container (e.g. a collection) without violating the
+data encapsulation principle (\ie, declare data as public).
+Java's iterators have the following methods:
+\begin{description}
+\item[hasNext()] Return true if there still remain elements to be returned.
+\item[next()] Return the next element in the container.  If there is
+  no such element (in which case \verb|hasNext()| should have returned
+  false), then throw an instance of \verb|NoSuchElementException|.
+\item[remove()] Remove the last element returned by \verb|next()| from
+  the container.  Throws an instance of class \verb|IllegalStateException| if
+  \verb|next()| has not yet been called or if the element has already
+  been removed.
+\end{description}
+The \verb|Iterator| interface itself is generic (covered in later assignments) but we will
+implement ours to work specifically with \textsf{Particle} objects.
+To access all the elements of a gravity simulation, and decide whether to
+delete them, one can write:
+\begin{quote}
+\begin{htmlonly}
+\begin{alltt}
+\end{htmlonly}
+%begin{latexonly}
+\begin{program}
+%end{latexonly}
+for (Iterator<Particle> it = $c$.iterator(); it.hasNext();) \{
+   Particle b = it.next();
+   if (\w{we don't want element b any more}) it.remove();
+\}
+%begin{latexonly}
+\end{program}
+%end{latexonly}
+\begin{htmlonly}
+\end{alltt}
+\end{htmlonly}
+\end{quote}
+Java has a special syntax of ``enhanced'' for-loops to make it easy to use
+iterators.  The shortcut:
+\begin{quote}
+\begin{htmlonly}
+\begin{alltt}
+\end{htmlonly}
+%begin{latexonly}
+\begin{program}
+%end{latexonly}
+for (Particle b : $c$) \{
+   ...
+\}
+%begin{latexonly}
+\end{program}
+%end{latexonly}
+\begin{htmlonly}
+\end{alltt}
+\end{htmlonly}
+\end{quote}
+is short for
+\begin{quote}
+\begin{htmlonly}
+\begin{alltt}
+\end{htmlonly}
+%begin{latexonly}
+\begin{program}
+%end{latexonly}
+for (Iterator<Particle> _secret = $c$.iterator(); _secret.hasNext();) \{
+   final Particle b = _secret.next();
+   ...
+\}
+%begin{latexonly}
+\end{program}
+%end{latexonly}
+\begin{htmlonly}
+\end{alltt}
+\end{htmlonly}
+\end{quote}
+
+\subsection{Fail-Fast Iterators}
+
+When using standard Java collections,
+iterators become ``stale'' if the collection changes, except by using
+the iterator's own \verb|remove| method.  (This does not happen with
+cursors, because the ADT has more control over its cursors.)
+It is not legal to
+use a stale iterator for anything, even calling \verb|hasNext|.
+In other words, if you request an iterator and later add an element to
+the collection, then you are not allowed to use the iterator again.
+If you want an iterator, you must request a new one.
+
+Implementors of Java's standard 
+collections are encouraged to provide \emph{fail-fast}
+implementations of iterators which ``usually'' throw an exception
+(an instance of \textsf{ConcurrentModificationException})
+when a stale iterator is used.
+
+Typically, this ability is handled by adding an integer version stamp to every
+collection and iterator.  The version should be incremented inside \emph{every method} that
+modifies the collection.  If an iterator notices that the version doesn't
+match, it throws the required exception before performing any method.
+This is \emph{not} part of the invariant: if the invariant fails, it
+is because the ADT implementation contained a bug; if the version stamp doesn't match it
+is because the ADT was misused. Therefore, if the versions don't
+match, do not check anything in the invariant checker.
+
+The iterator version only changes if the collection was changed under
+its control (i.e., using \verb|remove|).
+
+\subsection{Nested classes}
+
+A (non-static)
+nested class is interesting: it is considered to be ``inside of'' the
+object in which it was created and thus has access to all the
+(private) fields and (private) methods as if they were its own.
+This is not inheritance: it doesn't actually get any fields or methods
+from the surrounding class, but it \emph{can} access them.
+It is even more confusing if the nested class extends some other
+class.  But we won't do that for this assignment.
+
+Nested classes are often used to implement iterators since an iterator
+needs access to private internals of the collection class.
+%Nested classes (and anonymous classes) are also used to implement
+%listeners, if you don't always want \verb|this| to be its own listener.
+Within the iterator, you can use the fields of the outer class directly.
+If there are two fields with the same name in the outer and inner classes,
+you can refer to the one in the outer class by the syntax 
+\emph{OuterClassName.this.outerClassField}.
+For example, in this homework, the iterator's invariant checker will
+need to call (not assert!) the \verb|_wellFormed| in the outer class
+(instead of the one within the iterator), by including the call
+\verb|ParticleCollection.this._wellFormed()|.
+
+%\subsection{Variable-Arity Parameters}%
+%
+%You may have noticed that the driver for Homework~\#3 had a method
+%whose parameter had type \verb|HexTile...| and was called with a
+%variable number of parameters.  Java supports variable arity methods
+%by implicitly creating an array around them and passing the array.
+%Thus inside the method body, the variable-arity paranmeters can be
+%accessed using normal array operations.
+
+%\subsection{Event Handlers}
+%
+%With Java's graphics model, events are reacted to, rather than
+%detected.  In other words, rather than repeatedly asking ``Did someone
+%click my window?'' a Java application program will say ``when someone
+%clicks my window, let me know.''  The application program will call 
+%\verb|add|$X$\verb|Listener| on the window or applet 
+%from which it wants to receive events, where $X$ is the kind of event.
+%Then the general event system will
+%call a method when the window is clicked.  The object to be notified
+%must implement the required interface.  
+%
+%% One can use anonymous classes as event handlers, but in this homework,
+%% we will simply have the applet itself implement the event handling interface And
+%% the required methods.
+%% In the case of mouse clicking,
+%% the interface is named \verb|MouseListener|.  If one is only interested
+%% in clicking (as for this assignment), all the required methods can have empty
+%% bodies except for the method named \verb|mouseClicked|.
+%
+%\subsection{Anonymous classes}
+%
+%This week, we will work with the 
+%``action listener'' and ``mouse listener'' interfaces.  The former is simpler:
+%\begin{verbatim}
+%public interface ActionListener {
+%  public void actionPerformed(ActionEvent e);
+%}
+%\end{verbatim}
+%One could define a class that implemented this interface and then
+%create an instance of it:
+%\begin{verbatim}
+%public class MyActionListener implements ActionListener {
+%  public void actionPerformed(ActionEvent e) {
+%    // do something
+%  }
+%}
+%...
+%        new MyActionListener()
+%\end{verbatim}
+%But frequently, we don't really care what the name of the class is, we only want
+%to make an instance of it.  In that case we can create an instance
+%of an \emph{anonymous class} using the following syntax:
+%\begin{quote}
+%\begin{verbatim}
+%new ActionListener() {
+%  public void actionPerformed(ActionEvent e) {
+%    // do something
+%  }
+%}
+%\end{verbatim}
+%\end{quote}
+%This \emph{looks} as if we are creating an instance of the interface,
+%but actually we are creating an instance of a class that is never given
+%a (visible) name.  The anonymous class implements the interface and
+%defines the method \verb|actionPerformed|.
+%
+%This syntax can be used to create instances of anonymous subclasses
+%of normal classes too.  For instance, the class \texttt{MouseAdapter}
+%implements the \texttt{MouseListener} interface with methods that do
+%nothing.  One can make an instance that does something different for
+%one or more of the methods by using the anonymous class syntax:
+%\begin{quote}
+%\begin{verbatim}
+%this.addMouseListener(new MouseAdapter() {
+%    @Override
+%    public void mouseClicked(MouseEvent e) { ... }
+%});
+%\end{verbatim}
+%\end{quote}
+%%\textbf{NB}: To distinguish between a double-click and a single-click, use
+%%\verb|getClickCount| on the mouse event object.  A double click
+%%is always preceded by a single click in the same location.
+%
+%\noindent
+%\textbf{NB:} The solution uses anonymous classes for the mouse
+%listener and for the action listeners on the terrain buttons.
+%
+%\begin{latexonly}
+%\begin{ignore}
+%\section{Concurrent Programming without Race Conditions}
+%
+%Our animation programs are multi-threaded programs because the
+%timer/animation thread is different from the thread that handles
+%updating the screen.  Programming for this model requires some careful
+%work.  We were sloppy in the last homework, but this homework, you
+%will need to be careful to follow these rules:
+%\begin{itemize}
+%\item If a mutable field can be accessed in multiple threads, it
+%  should be marked ``volatile''\footnote{%
+%Or be protected by a synchronization lock, but that is too complicated
+%for us in CS 351.  CS 552 and 537 have more information on synchronization.}.
+%\item You can't change library classes.
+%\end{itemize}
+%One important consequence of these two simple rules is that a mutable
+%collection (instance of library class) must not be accessed in multiple
+%threads.  The simple solution is to make sure all shared collections
+%are \emph{immutable}: they never change.  
+%
+%In particular, the
+%collection of blocks used in the simulation should never change.
+%How then can one add or remove blocks?  There's a trick!  We make a
+%\emph{new} collection that is a copy of the list of blocks, make
+%changes to it (in one thread) and then install it as the (immutable!) list of
+%blocks being simulated.  The field that holds the list is mutable
+%(and will be marked ``volatile'').
+%
+%\subsection{Mutable Data Classes}
+%
+%If a class consists of fields with setters and getters, we call
+%it a ``data class.'' Such a class isn't a classic ADT, but just a way to stick
+%things together.  Use getters and setters rather than making the
+%fields public (a terrible idea) does have certain advantages.
+%In particular they can be overridden by subclasses.  We may see 
+%examples of this in the second half of this course.
+%A mutable data class doesn't have fixed values and thus it usually best practice
+%to \emph{not} override \texttt{equals} or \texttt{hashCode}.
+%
+%\section{Conversions from String}
+%
+%In our first week, we implemented \verb|toString()| methods
+%for getting a string version of the ADTs.  The reverse methods enables
+%ADT values to be written to text files and then read back in.
+%All three of our Homework \#~1 ADTs need static \verb|fromString|
+%methods;
+%we have implemented the most complex one for you: \verb|Time.fromString|.
+%We provide test cases for these conversions.
+%
+%You need to write the following string conversion methods:
+%\begin{description}
+%\item[Duration\#fromString(String)] (static)
+%   Convert a duration string back into a duration.
+%\item[Period\#fromString(String)] (static)
+%   Convert a period string back into a period.
+%\end{description}
+%These methods should throw an instance of
+%\verb|edu.uwm.cs351.util.FormatException| if an error in the string is
+%detected.  In particular, a \verb|NumberFormatException| must be
+%caught and converted into a \verb|FormatException| (there is a
+%constructor for this purpose).
+%\end{ignore}
+%\end{latexonly}

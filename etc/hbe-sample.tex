@@ -1,0 +1,20 @@
+  \begin{itemize}
+    \item Why is the \texttt{fromString} method in
+      \texttt{HexCoordinate} declared \texttt{static}?
+    \item Why does \texttt{fromString} throw in several places but
+      only catch in one place?  Why does it throw again inside the
+      catch?
+    \item In \texttt{HexBoardEditor} in the ``window closing''
+      listener, it has a loop \texttt{for (HexTile h : seq)}. What does
+      that mean?  How does it work?
+    \item In the constructor, it adds an action listener on each
+      ``terrain'' button.  Isn't \texttt{ActionListener} an interface?
+      How can we make an instance of an interface?
+    \item Why do we use a helper method \texttt{handleClick}?
+      It's only used in one place?
+    \item If we didn't ``return'' in the middle of
+      \texttt{handleClick}, what bad thing would happen?  Explain!
+    \item In order to draw the hex tiles on the screen, we need to
+      have a graphics object.  Where do we get it?  How do we create
+      it?  (trick question!)
+  \end{itemize}
