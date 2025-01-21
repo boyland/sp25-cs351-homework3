@@ -56,18 +56,19 @@ public class TestHexTileCollection2 extends TestCollection<HexTile> {
 	
 	/// Locked tests
 	
-	public void test66() {
+	public void test() {
 		HexTileCollection bc = new HexTileCollection();
 		// Give the string of the result or name of exception
 		// "it" was never assigned and so it is null; 
-		assertEqualsOrException("NullHexCoordinateerException",() -> it.hasNext());
+		assertEqualsOrException("NullPointerException",() -> it.hasNext());
 		it = bc.iterator();
 		assertEqualsOrException(Ts(12763851),() -> it.hasNext());
 		assertEqualsOrException(Ts(775338767),() -> it.next());
-		bc.add(e[1]); // added a HexTile
+		bc.add(e[1]); // added a HexTile LAND<1,1,0>
 		assertEqualsOrException(Ts(268544907),() -> it.hasNext());
 		it = bc.iterator();
 		assertEqualsOrException(Ts(1125408703),() -> it.hasNext());
+		assertEqualsOrException(Ts(1106512103), () -> it.next());
 	}
 	
 	
