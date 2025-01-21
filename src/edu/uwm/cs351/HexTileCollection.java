@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 import junit.framework.TestCase;
 
@@ -41,12 +42,12 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	
 	private HexTileCollection(boolean ignored) {} // DO NOT CHANGE THIS
 
-	private static boolean doReport = true; // only to be changed in JUnit test code
-	
-	private boolean report(String s) {
-		if (doReport) System.out.println(s);
-		return false;
-	}
+    private static Consumer<String> reporter = (s) -> System.out.println("Invariant error: "+ s);
+    
+    private boolean report(String error) {
+            reporter.accept(error);
+            return false;
+    }
 	
 	// The invariant:
 	private boolean wellFormed() {
@@ -122,16 +123,15 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		// TODO: assert wellFormed() after body
 	}
 	
-	/*
-	 * @see java.util.AbstractCollection#clear()
-	 */
-	@Override
+	@Override // efficiency
 	public void clear(){
 		// #(
 		assert wellFormed() : "invariant broken at beginning of clear()";
-		manyItems=0;
-		version++;
-		data = new HexTile[INITIAL_CAPACITY];
+		if (manyItems > 0) {
+			manyItems=0;
+		    version++;
+		    data = new HexTile[INITIAL_CAPACITY];
+		}
 		assert wellFormed() : "invariant broken at end of clear()";
 		// #)
 		// TODO: assert wellFormed() before body
@@ -185,7 +185,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	
 	private class MyIterator implements Iterator<HexTile> {
 		
-		int myVersion, currentIndex;
+		int colVersion, currentIndex;
 		boolean isCurrent;
 
 		MyIterator(boolean ignored) {} // DO NOT CHANGE THIS
@@ -207,7 +207,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			// #(
 			// 0.
 			if (!HexTileCollection.this.wellFormed()) return report("outer invariant broken during iteration");
-			if (myVersion == version) {
+			if (colVersion == version) {
 				// 1.
 				if (currentIndex<-1 || currentIndex>=manyItems) return report("currentIndex holds illegal value.");
 				// 2.
@@ -222,7 +222,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		 */
 		public MyIterator() {
 			// #(
-			myVersion = version;
+			colVersion = version;
 			currentIndex=-1;
 			isCurrent = false;
 			// #)
@@ -242,7 +242,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		public boolean hasNext() {
 			assert wellFormed() : "invariant fails at beginning of iterator hasNext()";
 			// #(
-			if (myVersion!=version)	throw new ConcurrentModificationException();
+			if (colVersion!=version)	throw new ConcurrentModificationException();
 			return (currentIndex+1 < manyItems);
 			/*
 			// #)
@@ -265,7 +265,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		public HexTile next() {
 			assert wellFormed() : "invariant fails at beginning of iterator next()";
 			// #(
-			if (myVersion!=version)	throw new ConcurrentModificationException();
+			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
 			++currentIndex;
 			HexTile cur = data[currentIndex];
@@ -295,14 +295,14 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		public void remove() {
 			assert wellFormed() : "invariant fails at beginning of iterator remove()";
 			// #(
-			if (myVersion!=version)	throw new ConcurrentModificationException();
+			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!isCurrent) throw new IllegalStateException("nothing to remove");
 			for (int i = currentIndex; i < manyItems - 1; i++)
 				data[i]=data[i+1];
 			manyItems--;
 			currentIndex--;
 			isCurrent = false;
-			myVersion++;
+			colVersion++;
 			version++;
 			// #)
 			//TODO
@@ -346,6 +346,79 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		return result;
 	}
 	
+    /**
+     * Used for testing the invariant.  Do not change this code.
+     */
+    public static class Spy {
+            /**
+             * Return the sink for invariant error messages
+             * @return current reporter
+             */
+            public Consumer<String> getReporter() {
+                    return reporter;
+            }
+
+            /**
+             * Change the sink for invariant error messages.
+             * @param r where to send invariant error messages.
+             */
+            public void setReporter(Consumer<String> r) {
+                    reporter = r;
+            }
+
+            /**
+             * Create a debugging instance of the main class
+             * with a particular data structure.
+             * @param a static array to use
+             * @param m size to use
+             * @param v current version
+             * @return a new instance with the given data structure
+             */
+            public HexTileCollection newInstance(HexTile[] a, int m, int v) {
+                    HexTileCollection result = new HexTileCollection(false);
+                    result.data = a;
+                    result.manyItems = m;
+                    result.version = v;
+                    return result;
+            }
+            
+            /**
+             * Return an iterator for testing purposes.
+             * @param bc main class instance to use
+             * @param c current index of iterator
+             * @param i the value of 'isCurrent'
+             * @param v the value of colVersion
+             * @return iterator with this data structure
+             */
+            public Iterator<HexTile> newIterator(HexTileCollection bc, int c, boolean i, int v) {
+                    MyIterator result = bc.new MyIterator(false);
+                    result.currentIndex = c;
+                    result.isCurrent = i;
+                    result.colVersion = v;
+                    return result;
+            }
+            
+            /**
+             * Return whether debugging instance meets the 
+             * requirements on the invariant.
+             * @param bs instance of to use, must not be null
+             * @return whether it passes the check
+             */
+            public boolean wellFormed(HexTileCollection bs) {
+                    return bs.wellFormed();
+            }
+            
+            /**
+             * Return whether debugging instance meets the 
+             * requirements on the invariant.
+             * @param i instance of to use, must not be null
+             * @return whether it passes the check
+             */
+            public boolean wellFormed(Iterator<HexTile> i) {
+                    return ((MyIterator)i).wellFormed();
+            }
+    }
+
 	public static class TestInvariant extends TestCase {
 		
 		protected HexTileCollection self;
@@ -360,7 +433,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		protected void setUp() {
 			self = new HexTileCollection(false);
 			iterator = self.new MyIterator(false);
-			doReport = false;
+			// doReport = false;
 		}
 		
 		// outer invariant 0 - null data
@@ -419,7 +492,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			++self.version;
 			assertTrue("versions don't match",iterator.wellFormed());
 			iterator.currentIndex = -1;
-			++iterator.myVersion;
+			++iterator.colVersion;
 			assertTrue("current OK",iterator.wellFormed());
 			iterator.currentIndex = 0;
 			assertFalse("currentIndex must be smaller than manyItems",iterator.wellFormed());
@@ -437,7 +510,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			self.manyItems = 2;
 			assertTrue(self.wellFormed());
 			assertTrue(iterator.wellFormed());
-			iterator.myVersion = 456;
+			iterator.colVersion = 456;
 			iterator.currentIndex = -1;
 			iterator.isCurrent = true;
 			assertFalse("currentIndex can't be -1 when isCurrent is true",iterator.wellFormed());
@@ -453,7 +526,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			assertFalse("currentIndex out of bounds",iterator.wellFormed());
 			iterator.isCurrent = false;
 			assertFalse("currentIndex out of bounds",iterator.wellFormed());
-			++iterator.myVersion;
+			++iterator.colVersion;
 			assertTrue(iterator.wellFormed());
 		}
 	}
