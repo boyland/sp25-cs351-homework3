@@ -1,7 +1,6 @@
 package edu.uwm.cs351;
 
 import java.util.AbstractCollection;
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -30,7 +29,10 @@ import junit.framework.TestCase;
  * You should use a version stamp to implement <i>fail-fast</i> semantics
  * for the iterator.
  */
-public class HexTileCollection extends AbstractCollection<HexTile> implements Collection<HexTile>, Iterable<HexTile>, Cloneable{
+public class HexTileCollection 
+// extends {Something} implements {Something else}
+extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Extension}
+{
 
 	/** Static Constants */
 	private static final int INITIAL_CAPACITY = 1;
@@ -54,7 +56,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		//TODO: write the invariant checker
 		// 0. data is not null
 		// 1. manyItems is a possible count of elements given the capacity of the array
-		//#(
+		//#(# \subsection{wellFormed}
 		if(data == null) return report("data is null");
 		if(manyItems < 0 || data.length < manyItems) return report("manyItems is incorrect");
 		//#)
@@ -76,7 +78,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	{
 		// TODO: implement constructor
 		// TODO: assert wellFormed() after body
-		//#(
+		//#(# \subsection{Constructor}
 		data = new HexTile[INITIAL_CAPACITY];
 		manyItems = 0;
 		version++;
@@ -95,37 +97,22 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		data = newData;
 	}
 	
-
-	/*
-	 * @see java.util.AbstractCollection#add(java.lang.Object)
-	 * NB: We are able to parameterize this method with HexTile
-	 * 	   because we have extended AbstractCollection with type parameter <HexTile>.
-	 */
-	@Override
+	// #(# \subsection{add}
+	@Override // implementation
 	public boolean add(HexTile n){
-		// #(
 		assert wellFormed() : "invariant broken at beginning of add()";
 		ensureCapacity(manyItems+1);
 		data[manyItems++] = n;
 		version++;
 		assert wellFormed() : "invariant broken at end of add()";
 		return true;
-		/*
-		// #)
-		return false;
-		// #(
-		 */
-		// #)
-		// TODO: assert wellFormed() before body
-		
-		// TODO: implement add(HexTile b)
-		
-		// TODO: assert wellFormed() after body
 	}
+	// #)
+	// TODO: You will need an "implementation" override
 	
+	// #(# \subsection{clear}
 	@Override // efficiency
 	public void clear(){
-		// #(
 		assert wellFormed() : "invariant broken at beginning of clear()";
 		if (manyItems > 0) {
 			manyItems=0;
@@ -133,52 +120,32 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		    data = new HexTile[INITIAL_CAPACITY];
 		}
 		assert wellFormed() : "invariant broken at end of clear()";
-		// #)
-		// TODO: assert wellFormed() before body
-		
-		// TODO: implement clear()
-		
-		// TODO: assert wellFormed() after body
 	}
+	// #)
+	// TODO: You will find an efficiency override necessary
 	
-	/*
-	 * @see java.util.AbstractCollection#size()
-	 */
+	@Override // required
 	public int size(){
-		// #(
+		// TODO: assert wellFormed() before body
+		// #(# \subsection{size}
 		assert wellFormed() : "invariant broken at beginning of size()";
 		return manyItems;
-		/*
-		// #)
-		return 0;
-		// #(
-		 */
-		// #)
-		// TODO: assert wellFormed() before body
-		
-		// TODO: implement size()
+		/* #)
+		return -1; // TODO
+		## */
 		
 		// NB: We don't have to check invariant at end of size(). Why?
 	}
 	
-	
-	/*
-	 * @see java.util.AbstractCollection#iterator()
-	 */
-	@Override
+	@Override // required
 	public Iterator<HexTile> iterator() {
-		// #(
+		// TODO: assert wellFormed() before body
+		// #(# \subsection{iterator}
 		assert wellFormed() : "invariant broken at beginning of iterator()";
 		return new MyIterator();
-		/*
-		// #)
-		return null;
-		// #(
-		 */
-		// #)
-		// TODO: assert wellFormed() before body
-		
-		// TODO return new iterator
+		/* #)
+		return null; // TODO: return new iterator
+		## */
 		
 		// NB: We don't have to check invariant at end of iterator(). Why?
 	}
@@ -204,7 +171,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			// 2. currentIndex is equal to -1 only if isCurrent is false
 			// TODO
 			
-			// #(
+			// #(# \subsection{Iterator wellFormed}
 			// 0.
 			if (!HexTileCollection.this.wellFormed()) return false;
 			if (colVersion == version) {
@@ -221,7 +188,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		 * Instantiates a new MyIterator.
 		 */
 		public MyIterator() {
-			// #(
+			// #(# |subsection{MyIterator constructor}
 			colVersion = version;
 			currentIndex=-1;
 			isCurrent = false;
@@ -238,19 +205,15 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		 * 
 		 * @throws ConcurrentModificationException if iterator version doesn't match collection version
 		 */
-		@Override
+		@Override // required
 		public boolean hasNext() {
 			assert wellFormed() : "invariant fails at beginning of iterator hasNext()";
-			// #(
-			if (colVersion!=version)	throw new ConcurrentModificationException();
+			// #(# \subsection{hasNext}
+			if (colVersion!=version) throw new ConcurrentModificationException();
 			return (currentIndex+1 < manyItems);
-			/*
-			// #)
-			return false;
-			// #(
-			 */
-			// #)
-			//TODO
+			/* #)
+			return false; // TODO
+			## */
 		}
 
 		/**
@@ -261,10 +224,10 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		 * @throws ConcurrentModificationException if iterator version doesn't match collection version
 		 * @throws NoSuchElementException if the iteration has no more elements
 		 */
-		@Override
+		@Override // required
 		public HexTile next() {
 			assert wellFormed() : "invariant fails at beginning of iterator next()";
-			// #(
+			// #(# \subsection{next}
 			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
 			++currentIndex;
@@ -275,12 +238,9 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 			assert wellFormed() : "invariant fails at end of iterator next()";
 			// #(
 			return cur;
-			/*
-			// #)
-			return null;
-			// #(
-			 */
-			// #)
+			/* #)
+			return null; // TODO
+			## */
 		}
 
 		/**
@@ -291,10 +251,10 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 		 * @throws IllegalStateException if the next() method has not yet been called, or the remove() 
 		 * 			method has already been called after the last call to the next() method
 		 */
-		@Override
+		@Override // implementation
 		public void remove() {
 			assert wellFormed() : "invariant fails at beginning of iterator remove()";
-			// #(
+			// #(# \subsection{Iterator remove}
 			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!isCurrent) throw new IllegalStateException("nothing to remove");
 			for (int i = currentIndex; i < manyItems - 1; i++)
@@ -319,6 +279,7 @@ public class HexTileCollection extends AbstractCollection<HexTile> implements Co
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.
 	 **/ 
+	@Override // decorate
 	public HexTileCollection clone( ) { 
 		assert wellFormed() : "invariant failed at start of clone";
 		HexTileCollection result;
