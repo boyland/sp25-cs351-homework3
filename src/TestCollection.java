@@ -437,73 +437,9 @@ public abstract class TestCollection<E> extends LockedTestCase {
 	}
 	
 	
-	/// text4X: testing clear
+	/// test4X: tests of iterator remove
 	
 	public void test40() {
-		c.clear();
-		assertEquals(0,c.size());
-	}
-	
-	public void test41() {
-		c.add(e[1]);
-		c.clear();
-		assertFalse(c.iterator().hasNext());
-	}
-	
-	public void test42() {
-		c.add(e[4]);
-		c.add(e[2]);
-		c.clear();
-		it = c.iterator();
-		assertException(NoSuchElementException.class,() -> it.next());
-	}
-	
-	public void test43() {
-		it = c.iterator();
-		c.add(e[3]);
-		c.clear();
-		if (failFast) {
-			assertException(ConcurrentModificationException.class, () -> it.hasNext());
-		}
-	}
-	
-	public void test44() {
-		it = c.iterator();
-		c.add(e[4]);
-		c.add(e[5]);
-		c.clear();
-		if (failFast) {
-			assertException(ConcurrentModificationException.class, () -> it.next());
-		}
-	}
-	
-	public void test45() {
-		c.add(e[4]);
-		c.add(e[5]);
-		c.clear();
-		assertEquals(0,c.size());
-		c.add(e[9]);
-		assertEquals(1,c.size());
-	}
-	
-	public void test46() {
-		c.add(e[4]);
-		c.add(e[6]);
-		it = c.iterator();
-		c.clear();
-		if (failFast) {
-			assertException(ConcurrentModificationException.class, () -> it.hasNext());
-			assertException(ConcurrentModificationException.class, () -> it.next());
-		}
-		it = c.iterator();
-		assertFalse(it.hasNext());
-		assertException(NoSuchElementException.class,() -> it.next());
-	}
-	
-	
-	/// test5X: tests of iterator remove
-	
-	public void test50() {
 		if (!hasRemove) return;
 		c.add(e[1]);
 		it = c.iterator();
@@ -513,7 +449,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		testcol(c,"{1} after remove(1)");
 	}
 	
-	public void test51() {
+	public void test41() {
 		if (!hasRemove) return;
 		c.add(e[8]);
 		c.add(e[4]);
@@ -529,7 +465,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		}
 	}
 	
-	public void test52() {
+	public void test42() {
 		if (!hasRemove) return;
 		c.add(e[8]);
 		c.add(e[4]);
@@ -543,7 +479,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		assertFalse(it.hasNext());
 	}
 	
-	public void test53() {
+	public void test43() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -563,7 +499,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		}
 	}
 	
-	public void test54() {
+	public void test44() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -585,7 +521,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		}
 	}
 
-	public void test55() {
+	public void test45() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -603,7 +539,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		assertFalse(it.hasNext());	
 	}
 
-	public void test56() {
+	public void test46() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -624,7 +560,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		}
 	}
 
-	public void test57() {
+	public void test47() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -639,7 +575,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		assertFalse(it.hasNext());	
 	}
 
-	public void test58() {
+	public void test48() {
 		if (!hasRemove) return;
 		c.add(e[6]);
 		c.add(e[1]);
@@ -652,7 +588,7 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		assertFalse(it.hasNext());	
 	}
 
-	public void test59() {
+	public void test49() {
 		if (!permitDuplicates || !preserveOrder || !hasRemove) return;
 		c.add(e[3]);
 		c.add(e[5]);
@@ -664,6 +600,115 @@ public abstract class TestCollection<E> extends LockedTestCase {
 		it.next();
 		it.remove();
 		testcol(c,"{3,5,3,4} after removing SECOND 3",e[3],e[5],e[4]);
+	}
+	
+	
+	/// text5X: testing clear
+	
+	public void test50() {
+		c.clear();
+		assertEquals(0,c.size());
+	}
+
+	public void test51() {
+		if (!hasRemove) return;
+		c.add(e[1]);
+		c.clear();
+		assertFalse(c.iterator().hasNext());
+	}
+
+	public void test52() {
+		if (!hasRemove) return;
+		c.add(e[4]);
+		c.add(e[2]);
+		c.clear();
+		it = c.iterator();
+		assertException(NoSuchElementException.class,() -> it.next());
+	}
+
+	public void test53() {
+		if (!hasRemove) return;
+		it = c.iterator();
+		c.add(e[3]);
+		c.clear();
+		if (failFast) {
+			assertException(ConcurrentModificationException.class, () -> it.hasNext());
+		}
+	}
+
+	public void test54() {
+		if (!hasRemove) return;
+		it = c.iterator();
+		c.add(e[4]);
+		c.add(e[5]);
+		c.clear();
+		if (failFast) {
+			assertException(ConcurrentModificationException.class, () -> it.next());
+		}
+	}
+
+	public void test55() {
+		if (!hasRemove) return;
+		c.add(e[4]);
+		c.add(e[5]);
+		c.clear();
+		assertEquals(0,c.size());
+		c.add(e[9]);
+		assertEquals(1,c.size());
+	}
+
+	public void test56() {
+		if (!hasRemove) return;
+		c.add(e[4]);
+		c.add(e[6]);
+		it = c.iterator();
+		c.clear();
+		if (failFast) {
+			assertException(ConcurrentModificationException.class, () -> it.hasNext());
+			assertException(ConcurrentModificationException.class, () -> it.next());
+		}
+		it = c.iterator();
+		assertFalse(it.hasNext());
+		assertException(NoSuchElementException.class,() -> it.next());
+	}
+	
+	public void test57() {
+		if (!hasRemove) return;
+		c.add(e[4]);
+		c.clear();
+		it = c.iterator();
+		c.clear();
+		assertFalse(it.hasNext());
+	}
+	
+	public void test58() {
+		if (!hasRemove) return;
+		c.add(e[5]);
+		c.add(e[8]);
+		c.add(e[0]);
+		c.add(e[1]);
+		c.add(e[2]);
+		c.add(e[1]);
+		c.add(e[2]);
+		c.add(e[3]);
+		c.add(e[4]);
+		c.add(e[5]);
+		c.add(e[8]);
+		it = c.iterator();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		it.next(); it.remove();
+		assertEquals(0, c.size());
+		c.clear();
+		assertFalse(it.hasNext());
 	}
 	
 	
