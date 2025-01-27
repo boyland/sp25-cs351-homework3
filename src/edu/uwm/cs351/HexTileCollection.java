@@ -6,51 +6,44 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-import junit.framework.TestCase;
-
 // This is a Homework Assignment for CS 351 at UWM
 
 /**
  * An array implementation of the Java Collection interface
  * We use java.util.AbstractCollection to implement most methods.
- * You should override clear() for efficiency, and add(HexTile)
- * for functionality.  You will also be required to override the abstract methods
- * size() and iterator().  All these methods should be declared "@Override".
  * 
  * The data structure is a dynamic sized array.
  * The fields should be:
  * <dl>
  * <dt>data</dt> The data array.
- * <dt>manyItems</dt> Number of true elements in the collection.
+ * <dt>manyItems</dt> Number of elements in the collection.
  * <dt>version</dt> Version number (used for fail-fast semantics)
  * </dl>
  * The class should define a private wellFormed() method
  * and perform assertion checks in each method.
- * You should use a version stamp to implement <i>fail-fast</i> semantics
- * for the iterator.
  */
 public class HexTileCollection 
 // extends {Something} implements {Something else}
 extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Extension}
 {
-
-	/** Static Constants */
 	private static final int INITIAL_CAPACITY = 1;
 
-	/** Collection Fields */
+	// #(# \subsection{Fields}
 	private int manyItems;
 	private int version;
 	private HexTile[] data;
-	
+	// #)
+	// TODO: Fields
+
 	private HexTileCollection(boolean ignored) {} // DO NOT CHANGE THIS
 
-    private static Consumer<String> reporter = (s) -> System.out.println("Invariant error: "+ s);
-    
-    private boolean report(String error) {
-            reporter.accept(error);
-            return false;
-    }
-	
+	private static Consumer<String> reporter = (s) -> System.out.println("Invariant error: "+ s);
+
+	private boolean report(String error) {
+		reporter.accept(error);
+		return false;
+	}
+
 	// The invariant:
 	private boolean wellFormed() {
 		//TODO: write the invariant checker
@@ -62,7 +55,7 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 		//#)
 		return true;
 	}
-	
+
 	/**
 	 * Initialize an empty HexTile collection with an initial
 	 * capacity of INITIAL_CAPACITY. The {@link #add(HexTile)} method works
@@ -85,18 +78,27 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 		assert wellFormed() : "invariant failed at end of constructor";
 		//#)
 	}
-	
+
+	// #(# \subsection{size}
+	@Override // required
+	public int size(){
+		assert wellFormed() : "invariant broken at beginning of size()";
+		return manyItems;
+	}
+	// #)
+	// TODO: override size (required!)
+
 	private void ensureCapacity(int minimumCapacity)
 	{
 		if (data.length >= minimumCapacity) return;
-		int newCapacity = Math.max(data.length*2+1, minimumCapacity);
+		int newCapacity = Math.max(data.length*2, minimumCapacity);
 		HexTile[] newData = new HexTile[newCapacity];
 		for (int i=0; i < manyItems; i++) 
 			newData[i] = data[i];
-		
+
 		data = newData;
 	}
-	
+
 	// #(# \subsection{add}
 	@Override // implementation
 	public boolean add(HexTile n){
@@ -109,56 +111,42 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 	}
 	// #)
 	// TODO: You will need an "implementation" override
-	
+
 	// #(# \subsection{clear}
 	@Override // efficiency
 	public void clear(){
 		assert wellFormed() : "invariant broken at beginning of clear()";
 		if (manyItems > 0) {
 			manyItems=0;
-		    version++;
-		    data = new HexTile[INITIAL_CAPACITY];
+			version++;
+			data = new HexTile[INITIAL_CAPACITY];
 		}
 		assert wellFormed() : "invariant broken at end of clear()";
 	}
 	// #)
 	// TODO: You will find an efficiency override necessary
-	
-	@Override // required
-	public int size(){
-		// TODO: assert wellFormed() before body
-		// #(# \subsection{size}
-		assert wellFormed() : "invariant broken at beginning of size()";
-		return manyItems;
-		/* #)
-		return -1; // TODO
-		## */
-		
-		// NB: We don't have to check invariant at end of size(). Why?
-	}
-	
+
+	// #(# \subsection{iterator}
 	@Override // required
 	public Iterator<HexTile> iterator() {
-		// TODO: assert wellFormed() before body
-		// #(# \subsection{iterator}
 		assert wellFormed() : "invariant broken at beginning of iterator()";
 		return new MyIterator();
-		/* #)
-		return null; // TODO: return new iterator
-		## */
-		
-		// NB: We don't have to check invariant at end of iterator(). Why?
 	}
-	
-	private class MyIterator implements Iterator<HexTile> {
-		
+	// #)
+	// TODO: Another "required" override
+
+	private class MyIterator 
+	implements Iterator<HexTile> // ### \subsection{MyIterator}
+	// TODO: implements {Something}
+	{
+
 		int colVersion, currentIndex;
 		boolean isCurrent;
 
 		MyIterator(boolean ignored) {} // DO NOT CHANGE THIS
-		
+
 		private boolean wellFormed() {
-			
+
 			// Invariant for recommended fields:
 			// NB: Don't check 1,2 unless the version matches.
 
@@ -170,7 +158,7 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 			// TODO
 			// 2. currentIndex is equal to -1 only if isCurrent is false
 			// TODO
-			
+
 			// #(# \subsection{Iterator wellFormed}
 			// 0.
 			if (!HexTileCollection.this.wellFormed()) return false;
@@ -183,7 +171,7 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 			// #)
 			return true;
 		}	
-		
+
 		/**
 		 * Instantiates a new MyIterator.
 		 */
@@ -197,50 +185,24 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 			assert wellFormed() : "invariant fails in iterator constructor";
 		}
 
-		/**
-		 * Returns true if the iteration has more elements. (In other words, returns true
-		 * if next() would return an element rather than throwing an exception.) 
-		 * 
-		 * @return true if the iteration has more elements
-		 * 
-		 * @throws ConcurrentModificationException if iterator version doesn't match collection version
-		 */
+		// #(# \subsection{Iterator body}
 		@Override // required
 		public boolean hasNext() {
 			assert wellFormed() : "invariant fails at beginning of iterator hasNext()";
-			// #(# \subsection{hasNext}
 			if (colVersion!=version) throw new ConcurrentModificationException();
 			return (currentIndex+1 < manyItems);
-			/* #)
-			return false; // TODO
-			## */
 		}
 
-		/**
-		 * Returns the next element in the iteration. 
-		 * 
-		 * @return the next element in the iteration
-		 * 
-		 * @throws ConcurrentModificationException if iterator version doesn't match collection version
-		 * @throws NoSuchElementException if the iteration has no more elements
-		 */
 		@Override // required
 		public HexTile next() {
 			assert wellFormed() : "invariant fails at beginning of iterator next()";
-			// #(# \subsection{next}
 			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!hasNext()) throw new NoSuchElementException();
 			++currentIndex;
 			HexTile cur = data[currentIndex];
 			isCurrent=true;
-			// #)
-			// TODO
 			assert wellFormed() : "invariant fails at end of iterator next()";
-			// #(
 			return cur;
-			/* #)
-			return null; // TODO
-			## */
 		}
 
 		/**
@@ -254,7 +216,6 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 		@Override // implementation
 		public void remove() {
 			assert wellFormed() : "invariant fails at beginning of iterator remove()";
-			// #(# \subsection{Iterator remove}
 			if (colVersion!=version)	throw new ConcurrentModificationException();
 			if (!isCurrent) throw new IllegalStateException("nothing to remove");
 			for (int i = currentIndex; i < manyItems - 1; i++)
@@ -264,12 +225,12 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 			isCurrent = false;
 			colVersion++;
 			version++;
-			// #)
-			//TODO
 			assert wellFormed() : "invariant fails at end of iterator remove()";
 		}
+		// #)
+		// TODO: Implement required methods
 	}
-	
+
 	/**
 	 * Generate a copy of this HexTile collection.
 	 * @param - none
@@ -306,189 +267,77 @@ extends AbstractCollection<HexTile> implements Cloneable // ### \subsection{Exte
 		assert result.wellFormed() : "invariant on result failed at end of clone";
 		return result;
 	}
-	
-    /**
-     * Used for testing the invariant.  Do not change this code.
-     */
-    public static class Spy {
-            /**
-             * Return the sink for invariant error messages
-             * @return current reporter
-             */
-            public Consumer<String> getReporter() {
-                    return reporter;
-            }
 
-            /**
-             * Change the sink for invariant error messages.
-             * @param r where to send invariant error messages.
-             */
-            public void setReporter(Consumer<String> r) {
-                    reporter = r;
-            }
+	/**
+	 * Used for testing the invariant.  Do not change this code.
+	 */
+	public static class Spy {
+		/**
+		 * Return the sink for invariant error messages
+		 * @return current reporter
+		 */
+		public Consumer<String> getReporter() {
+			return reporter;
+		}
 
-            /**
-             * Create a debugging instance of the main class
-             * with a particular data structure.
-             * @param a static array to use
-             * @param m size to use
-             * @param v current version
-             * @return a new instance with the given data structure
-             */
-            public HexTileCollection newInstance(HexTile[] a, int m, int v) {
-                    HexTileCollection result = new HexTileCollection(false);
-                    result.data = a;
-                    result.manyItems = m;
-                    result.version = v;
-                    return result;
-            }
-            
-            /**
-             * Return an iterator for testing purposes.
-             * @param bc main class instance to use
-             * @param c current index of iterator
-             * @param i the value of 'isCurrent'
-             * @param v the value of colVersion
-             * @return iterator with this data structure
-             */
-            public Iterator<HexTile> newIterator(HexTileCollection bc, int c, boolean i, int v) {
-                    MyIterator result = bc.new MyIterator(false);
-                    result.currentIndex = c;
-                    result.isCurrent = i;
-                    result.colVersion = v;
-                    return result;
-            }
-            
-            /**
-             * Return whether debugging instance meets the 
-             * requirements on the invariant.
-             * @param bs instance of to use, must not be null
-             * @return whether it passes the check
-             */
-            public boolean wellFormed(HexTileCollection bs) {
-                    return bs.wellFormed();
-            }
-            
-            /**
-             * Return whether debugging instance meets the 
-             * requirements on the invariant.
-             * @param i instance of to use, must not be null
-             * @return whether it passes the check
-             */
-            public boolean wellFormed(Iterator<HexTile> i) {
-                    return ((MyIterator)i).wellFormed();
-            }
-    }
+		/**
+		 * Change the sink for invariant error messages.
+		 * @param r where to send invariant error messages.
+		 */
+		public void setReporter(Consumer<String> r) {
+			reporter = r;
+		}
 
-	public static class TestInvariant extends TestCase {
-		
-		protected HexTileCollection self;
-		protected HexTileCollection.MyIterator iterator;
-		
-		private HexTile n1 = new HexTile(Terrain.FOREST, new HexCoordinate(0,0));
-		private HexTile n2 = new HexTile(Terrain.LAND, new HexCoordinate(1,0));
-		private HexTile n3 = new HexTile(Terrain.WATER, new HexCoordinate(0,1));
-		private HexTile n4 = new HexTile(Terrain.MOUNTAIN, new HexCoordinate(1,1));
-		
-		@Override
-		protected void setUp() {
-			self = new HexTileCollection(false);
-			iterator = self.new MyIterator(false);
-			// doReport = false;
+		/**
+		 * Create a debugging instance of the main class
+		 * with a particular data structure.
+		 * @param a static array to use
+		 * @param m size to use
+		 * @param v current version
+		 * @return a new instance with the given data structure
+		 */
+		public HexTileCollection newInstance(HexTile[] a, int m, int v) {
+			HexTileCollection result = new HexTileCollection(false);
+			result.data = a;
+			result.manyItems = m;
+			result.version = v;
+			return result;
 		}
-		
-		// outer invariant 0 - null data
-		public void test01() {
-			assertFalse("null data", self.wellFormed());
+
+		/**
+		 * Return an iterator for testing purposes.
+		 * @param bc main class instance to use
+		 * @param c current index of iterator
+		 * @param i the value of 'isCurrent'
+		 * @param v the value of colVersion
+		 * @return iterator with this data structure
+		 */
+		public Iterator<HexTile> newIterator(HexTileCollection bc, int c, boolean i, int v) {
+			MyIterator result = bc.new MyIterator(false);
+			result.currentIndex = c;
+			result.isCurrent = i;
+			result.colVersion = v;
+			return result;
 		}
-		
-		// outer invariant 2 - null element in count
-		public void test02() {
-			self.data = new HexTile[2];
-			assertTrue(self.wellFormed());
-			self.manyItems = -1;
-			assertFalse(self.wellFormed());
-			self.manyItems = 2;
-			self.data[0] = null;
-			self.data[1] = n1;
-			assertTrue("null element OK",self.wellFormed());
-			self.manyItems = 0;
-			assertTrue("good empty collection of length 2",self.wellFormed());
+
+		/**
+		 * Return whether debugging instance meets the 
+		 * requirements on the invariant.
+		 * @param bs instance of to use, must not be null
+		 * @return whether it passes the check
+		 */
+		public boolean wellFormed(HexTileCollection bs) {
+			return bs.wellFormed();
 		}
-		
-		// outer invariants 1, 2 - count off
-		public void test03() {
-			self.data = new HexTile[4];
-			self.manyItems = 1;
-			assertTrue("manyItems is OK",self.wellFormed());
-			self.manyItems = 0;
-			self.data[0] = n1;
-			self.data[1] = n2;
-			assertTrue("good empty collection",self.wellFormed());
-			self.manyItems = 1;
-			assertTrue("good one element collection",self.wellFormed());
-			self.manyItems = 3;
-			self.data[3] = n3;
-			++self.manyItems;
-			self.data[2] = n4;
-			assertTrue("good four element collection",self.wellFormed());
-			++self.manyItems;
-			assertFalse("manyItems of 5 in data array of length 4",self.wellFormed());
-		}
-		
-		// inner invariant 0 - outer invariant broken
-		public void test04() {
-			self.data = new HexTile[2];
-			self.manyItems = -1;
-			assertFalse("outer invariant should fail",iterator.wellFormed());
-		}
-		
-		// iterator invariant 1, 2, invariant only enforced if versions match
-		public void test05() {
-			self.data = new HexTile[2];
-			iterator.currentIndex = -10;
-			assertFalse("currentIndex too small",iterator.wellFormed());
-			iterator.currentIndex = 1;
-			assertFalse("currentIndex too big",iterator.wellFormed());
-			++self.version;
-			assertTrue("versions don't match",iterator.wellFormed());
-			iterator.currentIndex = -1;
-			++iterator.colVersion;
-			assertTrue("current OK",iterator.wellFormed());
-			iterator.currentIndex = 0;
-			assertFalse("currentIndex must be smaller than manyItems",iterator.wellFormed());
-			iterator.currentIndex = -1;
-			iterator.isCurrent = true;
-			assertFalse("cannot have current when at index -1",iterator.wellFormed());
-		}
-		
-		// iterator invariant 1, 2, invariant only enforced if versions match
-		public void test06() {
-			self.data = new HexTile[10];
-			self.version += 456;
-			self.data[0] = n1;
-			self.data[1] = n2;
-			self.manyItems = 2;
-			assertTrue(self.wellFormed());
-			assertTrue(iterator.wellFormed());
-			iterator.colVersion = 456;
-			iterator.currentIndex = -1;
-			iterator.isCurrent = true;
-			assertFalse("currentIndex can't be -1 when isCurrent is true",iterator.wellFormed());
-			iterator.isCurrent = false;
-			assertTrue(iterator.wellFormed());
-			iterator.currentIndex = 0;
-			assertTrue(iterator.wellFormed());
-			iterator.currentIndex = 1;
-			assertTrue(iterator.wellFormed());
-			iterator.isCurrent = true;
-			assertTrue(iterator.wellFormed());
-			iterator.currentIndex = 2;
-			assertFalse("currentIndex out of bounds",iterator.wellFormed());
-			iterator.isCurrent = false;
-			assertFalse("currentIndex out of bounds",iterator.wellFormed());
-			++iterator.colVersion;
-			assertTrue(iterator.wellFormed());
+
+		/**
+		 * Return whether debugging instance meets the 
+		 * requirements on the invariant.
+		 * @param i instance of to use, must not be null
+		 * @return whether it passes the check
+		 */
+		public boolean wellFormed(Iterator<HexTile> i) {
+			return ((MyIterator)i).wellFormed();
 		}
 	}
 }
