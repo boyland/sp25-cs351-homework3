@@ -4,51 +4,85 @@
 \usepackage[problem]{handout}
 \usepackage{alltt}
 \usepackage{program}
-\usepackage{html}
+\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{pict2e}
 
 \setlength{\unitlength}{2pt}
 
-% latex2html wrecks \framebox commands in pictures
-% so we give it a new name in a way that latex2html 
-% doesn't understand so it will leave them alone.
-\let\FrameBox=\framebox
-
 \newcommand{\ie}{{i.e.}}
 
-\class{CS 351: Data Structures \& Algorithms}
-\period{Spring 2021}
+\class{CompSci 351/CompSt 751: Data Structures \& Algorithms}
+\period{Spring 2025}
 \title[Homework \#3]{Homework \#3\\ 
-\textbf{due Monday, February 15, midnight}}
+\textbf{due Monday, February 10, 10pm}}
 
 \begin{document}
 \maketitle
-This assignment will focus on the concepts of collections 
-and using/implementing iterators.
+In this homework, 
+you will implement and then use a collection
+class with an interface from Java's library collection system.
+The collection will use the same data structure as Homework \#2
+(``dynamic array''), this time for the \textsf{Collection} ADT rather than the
+\textsf{Sequence} ADT.
+
+Use this link to accept the assignment:
+\begin{quote}
+\url{INVITE_LINK}
+\end{quote}
 
 \section{Concepts}
 
-%\subsection{Interfaces}
-%
-%A Java ``interface'' is a special kind of ``abstract class.''
-%A Java \emph{interface} specifies a set of (public) operations that an ADT
-%might be expected to implement.  An ADT implementation signals its
-%adherence to the interface by adding ``\texttt{implements $I$}'' 
-%to the class header, where
-%$I$ is the name of the interface.
-%
-%A Java variable (field, parameter or local) may have an interface as a
-%type.  Of course the variable is \emph{not} an instance of this type,
-%since interfaces are abstract---they don't provide any implementation.
-%Instead they are instances of some class that implements the interface.
-%In Java, it is considered better to use interfaces for the type of
-%variables or method returns instead of concrete classes since it makes
-%the program more general.
+In this week, you will work with several concepts that don't have
+their own chapter in the textbook.
+
+\subsection{Interfaces}
+
+A Java ``interface'' is a special kind of ``abstract class.''
+A Java \emph{interface} specifies a set of (public) operations
+(``methods'' in Java) that an ADT
+might be expected to implement.  An ADT implementation signals its
+adherence to the interface by adding ``\texttt{implements $I$}'' 
+to the class header, where
+$I$ is the name of the interface.
+Some interfaces don't mention any methods; 
+rather they are \emph{marker} interfaces that 
+mark the willingness of the class to satisfy certain properties.
+
+Some of the Java standard interfaces that we will be using in this course are listed here:
+\begin{description}
+\item[\texttt{Cloneable}] A marker interface for classes that permit the built-in 
+\verb|Object#clone()| method to make a shallow copy.
+\item[\texttt{Comparable<T>}] These classes 
+implement a \texttt{compareTo} method taking a parameter of type \texttt{T}.
+\item[\texttt{Iterator<T>}] These are iterator objects.
+\item[\texttt{Iterable<T>}] These classes will provide an
+  \texttt{iterator()} method returning an iterator.
+\item[\texttt{Collection<T>}] These are classes that provide all the collection methods 
+(see below for more).
+\end{description}
+
+A Java variable (field, parameter or local) may have an interface as a
+type.  Of course the variable is \emph{not} an instance of this type,
+since interfaces are abstract---they don't provide any implementation.
+Instead they are instances of some class that implements the interface.
+In Java, it is considered better to use interfaces for the type of
+variables or method returns instead of concrete classes since it makes
+the program more general.
 
 %In this assignment, you will need to use
 %an interface called \verb|ActionListener| and
 %one ``generic'' interface both described later.
+
+\subsection{Generics}
+
+Many of the library classes are \emph{generic} so that they work with
+different reference types (e.g., classes).
+In this homework, we will work with several generic interfaces and
+classes.  If you fail to give the actual generic type parameter
+(inside angle brackets, e.g., \verb|List<String>|), Eclipse will
+warn you that you are using ``raw types.'' Raw types are not allowed
+for CS~351 homeworks, so make sure to take heed of the warnings.
 
 \subsection{Collection ADT}
 
