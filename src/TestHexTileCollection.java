@@ -1,6 +1,7 @@
 import java.util.Iterator;
 import java.util.function.Supplier;
 
+import edu.uwm.cs351.FormatException;
 import edu.uwm.cs351.HexCoordinate;
 import edu.uwm.cs351.HexTile;
 import edu.uwm.cs351.HexTileCollection;
@@ -71,5 +72,68 @@ public class TestHexTileCollection extends TestCollection<HexTile> {
 		assertEqualsOrException(Ts(1106512103), () -> it.next());
 	}
 	
+	/// HexTile tests:
 	
+	public void test90() {
+		HexTile h = HexTile.fromString("LAND<1,1,0>");
+		assertEquals(Terrain.LAND, h.getTerrain());
+		assertEquals(new HexCoordinate(1,1,0), h.getLocation());
+	}
+	
+	public void test91() {
+		HexTile h = HexTile.fromString("FOREST<2,1,1>");
+		assertEquals(Terrain.FOREST, h.getTerrain());
+		assertEquals(new HexCoordinate(2,1,1), h.getLocation());
+	}
+	
+	public void test92() {
+		HexTile h = HexTile.fromString("MOUNTAIN<2,2,0>");
+		assertEquals(Terrain.MOUNTAIN, h.getTerrain());
+		assertEquals(new HexCoordinate(2,2,0), h.getLocation());
+	}
+	
+	public void test93() {
+		HexTile h = HexTile.fromString("CITY<1,2,-1>");
+		assertEquals(Terrain.CITY, h.getTerrain());
+		assertEquals(new HexCoordinate(1,2,-1), h.getLocation());
+	}
+	
+	public void test94() {
+		HexTile h = HexTile.fromString("DESERT<3,1,2>");
+		assertEquals(Terrain.DESERT, h.getTerrain());
+		assertEquals(new HexCoordinate(3,1,2), h.getLocation());
+	}
+	
+	public void test95() {
+		HexTile h = HexTile.fromString("WATER<3,2,1>");
+		assertEquals(Terrain.WATER, h.getTerrain());
+		assertEquals(new HexCoordinate(3,2), h.getLocation());
+	}
+	
+	public void test96() {
+		HexTile h = HexTile.fromString("INACCESSIBLE<-3,-3,0>");
+		assertEquals(Terrain.INACCESSIBLE, h.getTerrain());
+		assertEquals(new HexCoordinate(-3,-3), h.getLocation());
+	}
+	
+	public void test97() {
+		for (int a = -10; a < 10; ++a) {
+			for (int b = -5; b < 5; ++b) {
+				for (Terrain t : Terrain.values()) {
+					HexTile h = new HexTile(t, new HexCoordinate(a,b));
+					String s = t + "<" + a + "," + b + "," + (a-b) + ">";
+					assertEquals("Faield to read " + s, h, HexTile.fromString(s));
+				}
+			}
+		}
+	}
+	
+	public void test98() {
+		assertException(IllegalArgumentException.class, () -> HexTile.fromString("LAND <3,2,1>"));
+	}
+	
+	public void test99() {
+		assertException(FormatException.class, () -> HexTile.fromString("LAND<3,2,1> "));
+		assertException(FormatException.class, () -> HexTile.fromString("LAND<3>"));
+	}
 }

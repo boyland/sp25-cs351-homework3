@@ -79,7 +79,7 @@ public class HexTile {
 	 * Return HexTile whose string is the given string.
 	 * @param s hex tile string of form TERRAIN<a,b,c>.  Must not be null
 	 * @return hex tile whose string is this method's parameter.
-	 * @throws FormatException if the strong format is bad.
+	 * @throws FormatException if the string format is bad.
 	 * @throws IllegalArgumentException if the terrain part is wrong
 	 */
 	public static HexTile fromString(String s) throws FormatException {
@@ -91,7 +91,9 @@ public class HexTile {
 		HexCoordinate loc = HexCoordinate.fromString(s.substring(x));
 		Terrain t = Terrain.valueOf(s.substring(0, x));
 		return new HexTile(t,loc);
-		// #)
+		/* #)
+		return null; // TODO
+		## */
 	}
 
 }
