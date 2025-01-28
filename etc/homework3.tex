@@ -86,10 +86,10 @@ for CS~351 homeworks, so make sure to take heed of the warnings.
 
 \subsection{Collection ADT}
 
-Soon after Java was released, the need for a standardized collections
-framework became apparent.  Accordingly, Java~1.2 introduced a
-standard collections framework.  Each of the collection classes
-implements a standard set of operations.
+The Java standard collection framework includes an interface
+\texttt{Collection} with a number of methods.  See the textbook
+Figure 5.7, page 301 (3rd.\ ed.\ Fig.\ 5.6, p.\ 290), or look at 
+\href{https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html}{the online documentation}.
 
 For this assignment, you will write a class that implements
 the standard Java Collection interface which has the following
@@ -114,159 +114,120 @@ methods (in addition to ones every object has):
       true if anything was removed.
     \item[clear()] Remove everything from the collection.
 \end{description}
-\pagebreak
-Now, as it happens, some of these operations are more fundamental than
-others.  For example, if iterators are working, it's easy to write
-\verb|contains|:
-\begin{quote}
-\begin{verbatim}
-public boolean contains(Object o) {
-    Iterator<E> e = iterator();
-    if (o==null) {
-        while (e.hasNext())
-            if (e.next()==null)
-                return true;
-    } else {
-        while (e.hasNext())
-            if (o.equals(e.next()))
-                return true;
-    }
-    return false;
-}
-\end{verbatim}
-(This code is copyright \copyright 2004 by Sun Microsystems.)
-\end{quote}
-Notice how the code calls \verb|iterator()| which is the
-(unimplemented) \verb|iterator| method in the same class.
-As it happens, if iterators are working, then many methods can be
-implemented in terms of iterators.
+But it's a lot of work to implement all these methods so Java provides a class \texttt{AbstractCollection} that implements all but two of these methods.
+You should have your class extend \texttt{AbstractCollection}.
+See \href
+{https://docs.oracle.com/javase/8/docs/api/java/util/AbstractCollection.html}{the online documentation}.
 
-For this reason, the Java collections framework includes
-\verb|AbstractCollection|,
-an abstract class\footnote{We assume you were taught abstract classes
-  in CS~251.}
-that does precisely this: implement
-everything using iterators, with that crucial part omitted:
-the \verb|iterator()| method is defined as ``abstract,'' that is
-unimplemented.
+When you implement a class that inherits from an abstract class
+like \texttt{AbstractCollection}, you must decide which methods to override.
+Some reasons to override include:
+\begin{enumerate}
+\item The abstract class does not provide an implementation
+  for this method, so that Java \emph{requires} that we
+  override/implement the method.  Keyword: \texttt{required}
+\item The provided implementation is incorrect.  For example, it may
+  simply throws an exception indicating that the method is not
+  \emph{really} implemented.
+(Immutable classes typically use this approach for all methods that
+  can modify the collection.)
+  Keyword: \texttt{implementation}
+\item The provided implementation is logically correct, but
+  inefficient for your data structure.
+  Keyword: \texttt{efficiency}
+\item The inherited implementation needs to be added to in some way.  Keyword: \texttt{decorate} (This kind of overriding is used only by \texttt{clone} for this assignment.)
+\end{enumerate}\texttt{AbstractCollection}.
+See \href
+{https://docs.oracle.com/javase/8/docs/api/java/util/AbstractCollection.html}{the
+  online documentation}. 
 
-Now \verb|size()| is also not implemented, even though it would be
-perfectly possible (albeit inefficient) to implement that method with
-iterators.  It is left abstract because presumably each collection has
-a more efficient way to keep track of the size than iterating through
-the whole collection.
-The \verb|clear| method is similar: it is easy enough to implement
-using iterators:
-\begin{quote}
-\begin{verbatim}
-public void clear() {
-    Iterator<E> e = iterator();
-    while (e.hasNext()) {
-        e.next();
-        e.remove();
-    }
-}
-\end{verbatim}
-(This code is copyright \copyright 2004 by Sun Microsystems.)
-\end{quote}
-Indeed the abstract class includes this implementation, but notes that
-a more efficient implementation should be possible.
-
-The \verb|add(...)| method is implemented in the
-\verb|AbstractCollection| class, but the implementation is not
-useful: it simply throws an exception that the operation (add) is
-``unsupported.''  Indeed, there's no way one can add an element using
-an iterator.  So, again, extenders are encouraged to override this
-method with a proper implementation.
-
-%\subsection{Generics}
-
-%A \emph{generic} class has type parameters enclosed in angle brackets,
-%for example \verb|class ArrayList<T>|; here $T$ is the only generic
-%type parameter.  Inside the body of the class $T$ can be used as a
-%regular type.  When the class is used, you need to instantiate it with
-%an actual type parameter, for instance \verb|String| or
-%\verb|Poset|.  
-%There is a problem with writing generic classes containing arrays --
-%Java does not allow creating generic arrays directly, \ie, 
-%\verb|T[] data = new T[10]| is a compiler error.
-%In this assignment, we provide a private helper method
-%\verb|makeArray(int)| to create arrays of generic type.
+When you implement a class that inherits from an abstract class
+like \texttt{AbstractCollection}, you must decide which methods to override.
+Some reasons to override include:
+\begin{enumerate}
+\item The abstract class does not provide an implementation
+  for this method, so that Java \emph{requires} that we
+  override/implement the method.  Keyword: \texttt{required}
+\item The provided implementation is inefficient for your data
+  structure.
+  Keyword: \texttt{efficiency}
+\item The provided implementation is incorrect.  For example, the \texttt{add} method of \texttt{AbstractCollection}
+  simply throws an exception indicating that the method is not
+  \emph{really} implemented.
+(Immutable classes typically use this approach for all methods that
+  can modify the collection.)
+  A mutable collection will need to override this implementation.
+  Keyword: \texttt{implementation}
+\item The inherited implementation needs to be added to in some way.  Keyword: \texttt{decorate} (This kind of overriding is not used in this assignment.)
+\end{enumerate}
+If none of these apply, you should refrain from overriding.
+Please comment all overridings with the keyword,
+(e.g. ``\texttt{@Override //
+  efficiency}'').
 
 \subsection{Iterators}
-An iterator is an object that enables a programmer 
-to traverse a container (e.g. a collection) without violating the
-data encapsulation principle (\ie, declare data as public).
+
+\texttt{Collection}s, as well as some other classes, provide iterators, which
+are an interface allowing access to each element, one-at-a-time, and once each.
+We implemented something similar as part of the \texttt{Sequence} ADT,
+but iterators are more powerful than such ``cursors.''
+The big advantages are (1) that one can have multiple
+iterators (whereas there's just one cursor for each \textsf{Sequence})
+and (2) then changing the state of an iterator (e.g., advancing it) does not affect the collection itself.
+But since iterators are separate objects from the collections, if the
+collection changes, the iterator can go ``stale.''  Implementations
+try to prevent the usage of stale iterators, throwing an instance of
+\texttt{ConcurrentModificationException} but the checks are not
+foolproof.  
+
 Java's iterators have the following methods:
 \begin{description}
-\item[hasNext()] Return true if there still remain elements to be returned.
-\item[next()] Return the next element in the container.  If there is
-  no such element (in which case \verb|hasNext()| should have returned
+\item[hasNext()] Return true if there are elements that have not
+yet been accessed by this iterator.
+\item[next()] Advances the iterator, accessing and returning
+  an element that had not yet been accessed (now the current element).
+  If there is no such element (in which case \verb|hasNext()| should have returned
   false), then throw an instance of \verb|NoSuchElementException|.
-\item[remove()] Remove the last element returned by \verb|next()| from
-  the container.  Throws an instance of class \verb|IllegalStateException| if
-  \verb|next()| has not yet been called or if the element has already
-  been removed.
+\item[remove()] Remove the current element (the one \emph{previously} returned by
+  \verb|next()|). If \texttt{next()} has not yet been called, or if
+  the last accessed element has already been removed, then this method throws an
+  \texttt{IllegalStateException}, since there is no current element.
 \end{description}
-The \verb|Iterator| interface itself is generic (covered in later assignments) but we will
-implement ours to work specifically with \textsf{HexTile} objects.
-To access all the elements of a gravity simulation, and decide whether to
+Each iterator moves separately through the container. Our iterator is a nested
+class, so it is able to access private fields and methods of the collection.
+
+The \verb|Iterator| interface is generic; the type of the elements
+in the collection needs to be specified.
+To access all the elements of a collection, and decide whether to
 delete them, one can write:
 \begin{quote}
-\begin{htmlonly}
-\begin{alltt}
-\end{htmlonly}
-%begin{latexonly}
 \begin{program}
-%end{latexonly}
-for (Iterator<HexTile> it = $c$.iterator(); it.hasNext();) \{
-   HexTile b = it.next();
-   if (\w{we don't want element b any more}) it.remove();
+for (Iterator<$T$> it = $c$.iterator(); it.hasNext();) \{
+   $T$ x = it.next();
+   if (\w{we don't want element x any more}) it.remove();
 \}
-%begin{latexonly}
 \end{program}
-%end{latexonly}
-\begin{htmlonly}
-\end{alltt}
-\end{htmlonly}
 \end{quote}
+In this assignment, we will be using iterators specifically on
+\texttt{HexTile} objects.
+
 Java has a special syntax of ``enhanced'' for-loops to make it easy to use
 iterators.  The shortcut:
 \begin{quote}
-\begin{htmlonly}
-\begin{alltt}
-\end{htmlonly}
-%begin{latexonly}
 \begin{program}
-%end{latexonly}
-for (HexTile b : $c$) \{
+for ($T$ $x$ : $c$) \{
    ...
 \}
-%begin{latexonly}
 \end{program}
-%end{latexonly}
-\begin{htmlonly}
-\end{alltt}
-\end{htmlonly}
 \end{quote}
 is short for
 \begin{quote}
-\begin{htmlonly}
-\begin{alltt}
-\end{htmlonly}
-%begin{latexonly}
 \begin{program}
-%end{latexonly}
-for (Iterator<HexTile> secret = $c$.iterator(); secret.hasNext();) \{
-   final HexTile b = secret.next();
+for (Iterator<$T$> secret = $c$.iterator(); secret.hasNext();) \{
+   final $T$ $x$ = secret.next();
    ...
 \}
-%begin{latexonly}
 \end{program}
-%end{latexonly}
-\begin{htmlonly}
-\end{alltt}
-\end{htmlonly}
 \end{quote}
 
 \subsection{Fail-Fast Iterators}
@@ -289,7 +250,8 @@ when a stale iterator is used.
 
 Typically, this ability is handled by adding an integer version stamp to every
 collection and iterator.  The version should be incremented inside \emph{every method} that
-modifies the collection.  If an iterator notices that the version doesn't
+modifies the number of elements in the collection (or moves them around).  If an iterator
+notices that the version doesn't 
 match, it throws the required exception before performing any method.
 This is \emph{not} part of the invariant: if the invariant fails, it
 is because the ADT implementation contained a bug; if the version stamp doesn't match it
@@ -315,9 +277,9 @@ needs access to private internals of the collection class.
 %Nested classes (and anonymous classes) are also used to implement
 %listeners, if you don't always want \verb|this| to be its own listener.
 Within the iterator, you can use the fields of the outer class directly.
-If there are two fields with the same name in the outer and inner classes,
+If there are two fields or methods with the same name in the outer and inner classes,
 you can refer to the one in the outer class by the syntax 
-\emph{OuterClassName.this.outerClassField}.
+\emph{OuterClassName.this.name}.
 For example, in this homework, the iterator's invariant checker will
 need to call (not assert!) the \verb|wellFormed| in the outer class
 (instead of the one within the iterator), by including the call
@@ -475,49 +437,110 @@ need to call (not assert!) the \verb|wellFormed| in the outer class
 %\end{ignore}
 %\end{latexonly}
 
-\section{What You Need To Do}
 
-You need to implement \texttt{HexTileCollection}, a \textsf{HexTile} array-based implementation of
-\textsf{Collection} by extending \verb|AbstractCollection| and overriding the following methods:
+\section{Concerning the \texttt{HexTileCollection} class}
+
+In the last homework, you implemented a \textsf{Sequence} ADT
+(specifically for hex tile objects) with a dynamic array data structure.
+For this assignment you will implement a \textsf{Collection} ADT,
+using \texttt{AbstractCollection}.
+You need to implement the \texttt{wellFormed} method for this class;
+it will be simpler than what you wrote for Homework \#2 because we
+have only the dynamic arrays, not the cursor.
+
+You will need to override some
+methods from the superclass/interface.  Only override the ones you
+need to override for one of the three reasons given above, and
+repeated here: it is \emph{required} by Java; we need to provide a
+more \emph{efficient} implementation, or for \emph{implementation}
+purposes (because the overridden implementation does the wrong thing).
+
+For the \textsf{Collection} interface, where an element goes if it is
+added is not specified, and indeed the ``add'' operation is optional to define.
+But our \texttt{HexTileCollection} ADT, \emph{does} define \texttt{add}:
+it places the argument hex tile at the end of the collection, and then
+returns ``true.''
+
+Iteration over this collection must have
+fail-fast semantics.  To do so, the main class should have a field
+named ``version'' that is incremented each time the number of elements
+is changed. Then the iterator will remember the version it was created
+for in a local field and then each public iterator method will check if
+there is a version discrepancy, in which case they throw an instance
+of \texttt{ConcurrentModificationException}.  The \texttt{remove}
+method will (of course) change the collection version and thus should
+also change the iterator's version, because it is still in sync with
+the collection.
+
+\subsection{Concerning the data structure of the iterator}
+
+The iterator should use the following data structure.
+It's more complicated than the cursor implementation because we need
+to make sure someone doesn't call \texttt{remove} twice in a row:
 \begin{description}
-\item[clear()] Remove all elements in the collection.
-\item[size()] Return the number of elements in the collection.
-\item[add(HexTile)] Add an element to the end of the collection.
-\item[iterator()] Return an iterator over the elements in the collection.
+  \item[currentIndex] The current index (index of the part most
+    recently returned by \texttt{next()}), that would be removed by
+    \texttt{remove()}.   If there is no such element, then it should be
+    the index of the previous element (initially -1).
+  \item[isCurrent] Whether there is an element at the current index
+    that can be removed.
+  \item[colVersion] The version of the collection that this iterator is
+    set up to work for.
 \end{description}
-Your class should use the same style as in the previous homework
-assignments: it should assert the correctness of the invariant before and after the 
-two methods (\verb|clear| and \verb|add|) that change the object's state, and
-at the beginning of the two
-methods (\verb|size| and \verb|iterator|) that merely observe the
-object's state.  The invariant should also be checked at the end of the
-constructor and when the iterator invariant is checked.
+You need to complete the \texttt{wellFormed} method.  The first thing
+it should do is to check the outer invariant using the syntax
+\begin{quote}
+  \texttt{HexTileCollection.this.wellFormed()}
+\end{quote}
+If the outer invariant fails, the iterator should return false without
+reporting anything in addition.
 
-You need to implement the nested iterator, and must provide the standard iterator methods described in previous section (repeated below) as well as the iterator's own \verb|wellFormed()| method.
-For an array-based collection (as what we have), the iterator 
-should have the fields that were used to control the cursor in the
-previous Homework (\verb|currentIndex| and \verb|isCurrent|).
+Then, perhaps unintuitively, the invariant checker should
+\emph{succeed} if the 
+version doesn't match.  That is because the invariant is used to
+protect against errors in the implementation of the collection class
+(or its iterator).  If the version doesn't match then it's not the
+fault of the implementer of the collection class; it's the fault of
+the user.  In such a case, the version could be very stale, so we
+don't check anything and blithely return ``true.''
+
+You should then check:
+\begin{enumerate}
+  \item The \texttt{currentIndex} field is a valid index in the dynamic array,
+    or equal to -1.
+  \item If \texttt{isCurrent} is true, the index must be a valid
+    index (-1 is not allowed).
+\end{enumerate}
+As usual, if no problems are found, we return true.
+
+\subsection{Note on debugging collection classes}
+
+The Eclipse debugger has an option to ``Show Logical Structure''
+\begin{quote}
+  \includegraphics{show-logical-structure}
+\end{quote}
+that you \emph{must} make sure is turned off (not boxed/highlighted)
+when debugging \texttt{HexTileCollection} (or any collection class you
+implement for this course).
+Otherwise, the debugger will not show you the fields of the class,
+but instead use the iterator methods to show what elements are in the collection.
+But if your iterator is not working (and that is one big reason why you would be debugging it!), 
+the display will not work.
+
+\subsection{Concerning the addition to the \texttt{HexTile} class}
+
+We are adding a new method to \texttt{HexTile}:
 \begin{description}
-\item[hasNext()] Return true if there still remain hex tiles to be returned.
-\item[next()] Return the next hex tile in the collection.  If there is
-  no such hex tile (\verb|hasNext()| should have returned
-  false), then throw an instance of \verb|NoSuchElementException|.
-\item[remove()] Remove the last hex tile returned by \verb|next()| from
-  the collection.  Throws an instance of class \verb|IllegalStateException| if
-  \verb|next()| has not yet been called or if the last-returned hex tile has already
-  been removed.  (You will need to use \verb|isCurrent| to remember if
-  there is a current value at the point of the current index.)
+  \item[fromString(s)] Convert a string to a hex tile.  The string
+    must have the form of a terrain string concatenated to a hex
+    coordinate string.
 \end{description}
-The public methods of the iterator should implement ``fail-fast semantics'' by throwing
-an instance of \verb|ConcurrentModificationException| if the version
-of the iterator doesn't match the version of the collection. Note that this check should occur
-within the iterator \emph{methods, after} checking the invariant. So a version mismatch will be handled
-by the iterator's public methods and \emph{not} the
-\verb|wellFormed()| method.
 
-Finally, you need to modify the \texttt{Demo} class from
-using the previous ADT \verb|{HexTileSeq|
-to using the new \texttt{HexTileCollection}.
+\subsection{Concerning the \texttt{Demo} class}
+
+Once the \texttt{HexTileCollection} class is working, you need to
+modify the \texttt{Demo} class 
+to use \texttt{HexTileCollection}.
 We provide a most of the implementation---you will need to implement
 what is remaining.  You may wish to refer to the code for
 \verb|Demo| in the solution to Homework \#2.  The code should work the same
@@ -527,23 +550,143 @@ You also need to use the newly added \texttt{fromString} method in the \texttt{H
 We recommend using the ''enhanced'' for-loop syntax mentioned above to keep things looking neat, but remember that behind the scenes it is using your own
 iterator implementation!
 
-\section{Files}
 
-The directory \verb|homework3.git| repository
-contains the following files:
+\section{What You Need To Do}
+
+Here are the recommended steps for this assignment.  After each step,
+and after each session.
+make sure to commit (and push if possible) your code.
+\begin{enumerate}
+\item In the starting repository, there is a very limited skeleton
+  file for \texttt{HexTileCollection}.  Add declarations so as to remove
+  all compiler errors.  In particular, compiler error in the Spy
+  must be handled by fixing the main class.  For instance, the Spy
+  assumes certain names for the fields---conform to these
+  assumptions.  Do not edit the Spy in
+  any circumstances---even if Eclipse suggests it!  If you find that
+  somehow you changed the Spy, see a TA to get the Spy restored.
+  
+  You will also need to add declarations so that the test
+  classes have no compilers error too.
+  
+  If a method needs to be added, then add a \emph{stub}: a
+  compiler-acceptable definition that does nothing interesting, for
+  example, returning \texttt{null} if some return object is
+  required.
+  
+  You must ensure that you have no ``raw'' type warnings.  These
+  indicate that you neglected to give the element type of a
+  collection or iterator.
+  
+\item
+  Then implement the \emph{two} \texttt{wellFormed} methods (for the
+  main class and for the iterator) and check that your
+  implementations pass the invariant tests: \texttt{TestInvariant}.
+  
+\item
+  Next unlock all remaining tests using \texttt{UnlockTest}: make
+  sure that you add the generated ``tst'' file to \textsf{git}.
+  
+\item
+  Then complete all the stubs in the main class.  Check that you
+  pass the tests in \texttt{TestHexTileCollection} (inherited from
+  abstract test class \texttt{TestCollection}) up through
+  \texttt{test06}.  (You can ignore the \texttt{test9}$n$ tests until
+  late in the process.)
+  
+\item
+  Then implement the iterator (except for removal) and make sure you can pass all the
+  tests through \texttt{test35}.
+  
+\item Then implement iterator remove and check that your code now
+  passes all the tests in \texttt{TestHexTileCollection} except for
+  \texttt{test9}$n$.
+
+\item Now implement \texttt{HexTile.fromString} and pass the remaining tests.
+  
+\item Use random testing to make sure you haven't worked around
+  the tests with special cases.  Once you pass random testing, it
+  is time to check efficiency.
+  
+\item Test that your algorithms are efficient with
+  \texttt{TestEfficiency}.  Most people's code will fail at least one, the
+  first time the test is run.  Fix the code so that passes efficiency
+  testing.
+
+\item Then re-run \texttt{TestHexTileCollection} and random testing to
+  make sure that you didn't mess up
+  a special case when handling efficiency.  It is a frequent occurrence
+  for random testing to fail at this point, even though it was passing
+  before.  Analyze the test that random testing gives you to find
+  where your code is handling a special case incorrectly.
+  
+\item Once all the tests are passing, move on to update the
+  implementation of \texttt{Demo} this time to use the collection
+  ADT.  This exercise ensures that you are able to \emph{use} the
+  collection ADT to accomplish some non-trivial tasks.
+\end{enumerate}  
+
+\section{Hints}
+
+New to this homework assignment are efficiency tests.
+Efficiency tests often fail in different ways than normal tests.  Of
+course, you can have a normal failure, but the interesting failure is
+when it takes a long time.  Typically the code is not in an infinite
+loop (a very basic efficiency problem you may have encountered in
+earlier courses) but just is not using the appropriate algorithm to
+finish the task in a reasonable length of time.  There's nothing
+``wrong'' with what the code is doing step by step, but it just
+takes too long.
+
+Furthermore, the fact that code takes a long time to run usually makes
+the typical ways of using a debugger (e.g., stopping the code at certain
+breakpoints and checking the values of variables) ineffective,
+because they simply take too long.
+Rather you should use the debugger, or even print statements to see if
+code reaches certain points in the test.\footnote{If you edit the
+  tests to add print statements, make sure to revert the changes, for
+  example using ``Replace With'' the \texttt{HEAD} version), before
+  committing the code.}
+
+It is even more important to analyze the test to see what it is doing:
+what is it doing a millions times?  Is that operation a constant-time?
+(Or at most log-time, as we shall see in later homework assignments).
+When you get stuck, post a question on Piazza that includes your analysis
+of what the test is doing: why is the test right to expect that
+operation should be fast?  (Or why do you disagree, that the operation
+cannot be fast?) Look for loops in the code that should be constant time.
+
+Here are some hints for this week's efficiency tests:
 \begin{description}
-\item[src/TestHexTileCollection.java] This class contains the test suites for the
-\verb|HexTileCollection| class and its iterator class.
-\item[src/TestInternals.java] Test driver for invariants of collection and iterator.
-\item[src/UnlockTest.java] Test driver that can unlock all the tests without executing them.
-\item[src/Demo.java] Test application that should show the same output as previous homeworks
-\item[src/edu/uwm/cs351/util/HexTileCollection.java] This is the skeleton file you should
-work with.
-\item[src/edu/uwm/cs351/util/HexTile.java] Updated with \texttt{fromString}
-\item[src/edu/uwm/cs351/util/HexCoordinate.java] Updated with \texttt{fromString}
-\item[test/sample.hex] A sample input file to use with \texttt{Demo.java}
+\item[test0] Why should \texttt{add} be constant time (on average)?
+\item[test3] How much is needed to initialize an iterator?
+\item[test4] How much work is needed to do \texttt{next}?
+\item[test5] How is \texttt{clear} implemented by default?  Can you
+  do better?
 \end{description}
 
+\section{Objectives}
+
+In doing this homework, it is intended that the student will learn
+\begin{itemize}
+\item to declare that a class implements an interface,
+\item to use the fact that a class implements an interface,
+\item to use generic library classes,
+% \item to use \texttt{ArrayList} to build a two-dimensional data
+%  structure,
+\item to implement a collection class, and when to override
+  methods,
+\item to use iterators, in normal ``for'' loops and also
+  ``for-each'' loops,
+\item when an iterator may be stale,
+\item to implement a fail-fast iterator,
+\item how to use a data structure to enable efficiency
+  implementations,
+\item to implement a static \texttt{FromString} method,
+  and
+\item how to diagnose elementary efficiency problems.
+\end{itemize}
+  
 \end{document}
 
 % LocalWords:  CS unenrolls ItemType int ADT turnin cc README href html STL cpp
@@ -560,5 +703,8 @@ work with.
 % LocalWords:  FormatException CollisionApplet isEmpty toArray addAll
 %%  LocalWords:  containsAll removeAll retainAll Microsystems boolean
 %%  LocalWords:  AbstractCollection Implementors wellFormed isCurrent
-%%  LocalWords:  currentIndex calledNext ParticleCollection
-%%  LocalWords:  ManyParticles ParticleSeq
+%%  LocalWords:  currentIndex calledNext ParticleCollection Cloneable
+%%  LocalWords:  ManyParticles ParticleSeq compareTo Iterable tst
+% LocalWords:  HexTileCollection superclass colVersion TestInvariant
+% LocalWords:  UnlockTest TestHexTileCollection TestCollection
+% LocalWords:  TestEfficiency

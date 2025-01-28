@@ -16,6 +16,8 @@ INSTALLSKEL = \
 	src/edu/uwm/cs351/HexTile.java \
 	src/Demo.java
 
+INSTALLGFX = show-logical-structure.png
+
 INSTALLDIR = src src/edu src/edu/uwm src/edu/uwm/cs351 lib test
 
 INSTALLJAR = -C ${HW1}/bin edu/uwm/cs351 \
