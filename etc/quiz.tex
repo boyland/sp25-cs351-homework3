@@ -1,0 +1,169 @@
+\documentclass[12pt]{article}
+
+\usepackage[problem]{handout}
+
+\pagenumbering{alph}
+\plainpagenumbering
+
+\class{CS 351/751: Data Structures \& Algorithms}
+\period{SEMESTER}
+\title[Quiz \#4]{Name: \hrulefill\hrulefill,\quad \hrulefill @uwm.edu}
+
+\begin{document}
+\maketitle
+
+In Homework \#3, we implemented a Ball collection with the following data structure:
+\begin{verbatim}
+public class BallCollection extends AbstractCollection<Ball> {
+    private Ball[ ] data;
+    private int manyItems;
+    private int version;
+    
+    /** Change the capacity of the dynamic array if needed.
+     * @param minimumCapacity the needed capacity
+     **/
+    private void ensureCapacity(int minimumCapacity) { ... }
+...
+}
+\end{verbatim}
+Add the following new method to the class:
+\begin{verbatim}
+/** Change the size of the collection to match the parameters.
+ * If the new size is shorter, elements at the end are lost.
+ * If the new size is longer, undefind elemenets (probably null) are added at the end.
+ * @param size requested new size
+ * @throws IllegalArgumentException if the requested new size is negative
+ **/
+public void setSize(int size) {
+   assert wellFormed() : "invariant broken at start of setSize";
+   // TODO
+\end{verbatim}
+\begin{solution}
+\begin{verbatim}
+  if (size < 0) throw new IllegalArgumentException("Cannot set size to " + size);
+  ensureCapacity(size);
+  if (manyItems != size) ++ version;
+  manyItems = size;
+  assert wellFOrmed() : "invariant broken by setSize";
+}
+\end{verbatim}
+\end{solution}
+
+\newpage
+\maketitle
+
+In Homework \#3, we implemented a Ball collection with the following data structure:
+\begin{verbatim}
+public class BallCollection extends AbstractCollection<Ball> {
+    private Ball[ ] data;
+    private int manyItems;
+    private int version;
+    
+    /** Change the capacity of the dynamic array if needed.
+     * @param minimumCapacity the needed capacity
+     **/
+    private void ensureCapacity(int minimumCapacity) { ... }
+...
+}
+\end{verbatim}
+Add the following new method to the class:
+\begin{verbatim}
+/** Add an element to the beginning of the collection.
+ * @param element element to add
+ **/
+public void addFront(Ball element) {
+    assert wellFormed() : "invariant broken at start of addFront";
+    // TODO
+\end{verbatim}
+\begin{solution}
+\begin{verbatim}
+    ensureCapacity(manyItems+1);
+    for (int i=manyItems; i > 0; --i) {
+        data[i] = data[i-1];
+    }
+    data[0] = element;
+    ++manyItems;
+    ++version;
+    assert wellFormed() : "invariant broken at end of addFront";
+}
+\end{verbatim}
+\end{solution}
+
+\newpage
+\maketitle
+
+
+In Homework \#3, we implemented a Ball collection with the following data structure:
+\begin{verbatim}
+public class BallCollection extends AbstractCollection<Ball> {
+    private Ball[ ] data;
+    private int manyItems;
+    private int version;
+    
+    /** Change the capacity of the dynamic array if needed.
+     * @param minimumCapacity the needed capacity
+     **/
+    private void ensureCapacity(int minimumCapacity) { ... }
+...
+}
+\end{verbatim}
+Add the following new method to the class:
+\begin{verbatim}
+/** Remove and return the last element in the collection.
+ * @throws IllegalStateException if the collection is empty
+ **/
+public Ball removeLast() {
+    assert wellFormed() : "invariant broken at start of removeLast";
+    // TODO
+\end{verbatim}
+\begin{solution}
+\begin{verbatim}
+    if (manyItems == 0) throw new IllegalArgumentException("cannot remove from empty collection");
+    Ball result = data[--manyItems];
+    ++version;
+    assert wellFormed() : "invariant broken at end of removeLast";
+    return result;
+}
+\end{verbatim}
+\end{solution}
+
+\newpage
+\maketitle
+
+In Homework \#3, we implemented a Ball collection with the following data structure:
+\begin{verbatim}
+public class BallCollection extends AbstractCollection<Ball> {
+    private Ball[ ] data;
+    private int manyItems;
+    private int version;
+    
+    /** Change the capacity of the dynamic array if needed.
+     * @param minimumCapacity the needed capacity
+     **/
+    private void ensureCapacity(int minimumCapacity) { ... }
+...
+}
+\end{verbatim}
+Add the following new method to the class:
+\begin{verbatim}
+/** Add all the elements of this collection to the end of itself.
+ * If the collection were [b1,b2], then afterwards, it would be [b1,b2,b1,b2].
+ **/
+public void double() {
+    assert wellFormed() : "invariant broken at start of double";
+    // TODO
+\end{verbatim}
+\begin{solution}
+\begin{verbatim}
+    ensureCapacity(manyItems * 2);
+    for (int i=0; i < manyItems; ++i) {
+        data[manyItems+i] = data[i];
+    }
+    if (manyItems > 0) ++version;
+    manyItems *= 2;
+    assert wellFormed() : "invariant broken by double";
+}
+\end{verbatim}
+\end{solution}
+
+\end{document}
