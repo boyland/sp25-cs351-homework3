@@ -1,0 +1,40 @@
+\begin{enumerate}
+   \item The \texttt{HexTileCollection} class extends \verb|AbstractCollection<HexTile>|
+      What does this mean?
+    %\item The \texttt{add} method calls \texttt{contains},
+     % but we didn't write that method. How does it even compile?
+    \item Why do we not include javadoc for some of the methods?
+      When is that allowed?
+    \item Why did we override \texttt{clear}? Wasn't there an inherited
+      version we could have used?
+    \item What about \texttt{size}?  Why did we override it?
+    \item There's \texttt{if} in the implementation of \texttt{clear}
+      that only sometimes does some tasks. What if we did that code
+      all the time?  Would it be less efficient?  Or incorrect?  Explain!
+    \item How come we don't override \verb|contains|?  Will the
+      operation work?  How? (Or will it simply throw an exception?)
+    \item The iterator's constructor sets the \texttt{currentIndex} to
+      -1.  How is that legal?  (-1 is not a legal array index).
+      In the previous assignment, the current index was equal to
+      \texttt{manyItems} where there was no current element.  Why not
+      use that concept?
+    \item Why does \texttt{next} set \texttt{isCurrent} to true?
+      What if it was already true?
+      % The \texttt{next} method is not supposed to remove elements, is it?
+    \item Which sequences of method calls should lead to a
+      \texttt{NoSuchElementException}? \texttt{IllegalStateException}?
+      \texttt{ConcurrentModificationException}? Come up with examples.
+    \item What are \texttt{version} and \texttt{colVersion}?
+      What do they have to do with \texttt{ConcurrentModificationException}?
+%    \item OK we used an inherited version of \texttt{Collection}'s \texttt{remove}.
+%      But this inherited version doesn't even know about our
+%      \texttt{version} field. How can it update the version correctly?
+    \item Why does the iterator's \texttt{remove} method update both
+      \texttt{version} and \texttt{colVersion}? Wouldn't leaving them
+      both alone accomplish the same thing?
+    \item Why do we increment the version but decrement \texttt{manyItems}?
+      Why not decrement both?
+    \item Why does \verb|remove()| decrement the index?  Do we
+      really want to go backwards?  Won't this mean we return the
+      same element twice?
+\end{enumerate}
