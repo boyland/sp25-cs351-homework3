@@ -56,7 +56,7 @@ public class Demo extends JFrame {
 		String input;
 		while ((input = r.readLine()) != null && !input.equalsIgnoreCase("quit")) {
 			try {
-				// #(
+				// #(# \subsection{readCol addition}
 				col.add(HexTile.fromString(input));
 				// #)
 				// TODO: use HexTiles static fromString method to get a hex tile and then add it to the collection
@@ -73,7 +73,7 @@ public class Demo extends JFrame {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				// #(
+				// #(# \subsection{paintComponent}
 				for (HexTile ht : col) {
 					ht.draw(g);
 				}
