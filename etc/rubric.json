@@ -1,0 +1,376 @@
+{"title":"Homework #3 Rubric",
+ "criteria":{
+     "0":{"description":"Quality: Show Work",
+	  "long_description":"Does the code provide enough commits to show the work?",
+	  "ratings":{
+	      "1":{"description":"Full Marks","points":1,
+		   "long_description":"Sufficient contentful commits."},
+	      "2":{"description":"Two Major","points":0.8,
+		   "long_description":"Two commits together are bigger than the rest combined."},
+	      "3":{"description":"One Major","points":0.5,
+		   "long_description":"More than a single commit, but one commit bigger than the rest combined."},
+	      "4":{"description":"No Marks","points":0,
+		   "long_description":"No commits, or only a single commit after the initial commit."}}},
+     "1":{"description":"Quality: Compiles cleanly",
+	  "long_description":"No errors or warnings during compilation",
+	  "ratings":{
+	      "1":{"description":"Full Marks","points":2,
+		   "long_description":"No compiler errors or warnings; no warnings suppressed except those given permission for."},
+	      "2":{"description":"Few warnings","points":1.5,
+		   "long_description":"No errors and all the warnings concern unused things, or things which we gave permission to suppress."},
+	      "3":{"description":"No errors","points":1,
+		   "long_description":"No compiler errors (no stop signs), but \"real\" warnings or improper suppression."},
+	      "4":{"description":"Partial","points":0.5,
+		   "long_description":"The only errors are those that don't affect execution (e.g import errors)."},
+	      "5":{"description":"No Marks","points":0,
+		   "long_description":"No changes, or errors in executable code."}}},
+     "3":{"description":"Quality: Code changes",
+	  "long_description":"Changes appropriate",
+	  "ratings":{
+	      "1":{"description":"Full Marks","points":1,
+		   "long_description":"Correct files changed."},
+	      "2":{"description":"Partial","points":0.5,
+		   "long_description":"Changes in test files involving only spacing."},
+	      "3":{"description":"No Marks","points":0,
+		   "long_description":"No changes at all, or files changed that should not be changed."}}},
+     "4":{"description":"Quality: Locked Tests",
+	  "long_description":"All locked tests unlocked.",
+	  "ratings":{
+	      "1":{"description":"Full Marks","points":1,
+		   "long_description":"All tests unlocked."},
+	      "2":{"description":"Most unlocked","points":0.75,
+		   "long_description":"Most locked tests done (at least 2/3 done)."},
+	      "3":{"description":"Partial","points":0.5,
+		   "long_description":"Some tests unlocked."},
+	      "4":{"description":"No Marks","points":0,
+		   "long_description":"Didn't commit/push any .tst files."}}},
+		"50": {
+			"description": "Quality: Code follows conventions",
+			"long_description": "All required conventions are followed: no suppressions, good javadoc, explicit @Override, private fields, camelCase for methods, good indentation",
+			"ratings": {
+				"0": {
+					"description": "Full Marks",
+					"points": 5,
+					"long_description": "All conventions followed exactly"
+				},
+				"1": {
+					"description": "Minor: javadoc",
+					"points": 4.8,
+					"long_description": "One minor javadoc violation, missed one method/constructor or a few required tags are missing"
+				},
+				"2": {
+					"description": "Minor: @Override",
+					"points": 4.6,
+					"long_description": "One missing @Override on a method."
+				},
+				"3": {
+					"description": "Minor: indentation",
+					"points": 4.5,
+					"long_description": "One case of bad indentation"
+				},
+				"4": {
+					"description": "Minor: private",
+					"points": 4.4,
+					"long_description": "fields are 'default' access"
+				},
+				"10": {
+					"description": "Most Marks",
+					"points": 4,
+					"long_description": "One serious problem, or a couple minor problems"
+				},
+				"20": {
+					"description": "Fair",
+					"points": 3,
+					"long_description": "Convention followed more that not"
+				},
+				"30": {
+					"description": "Poor",
+					"points": 2,
+					"long_description": "Substantial work with conventions often followed."
+				},
+				"40": {
+					"description": "Minimal",
+					"points": 1,
+					"long_description": "At least one good case of actively following the convention."
+				},
+				"50": {
+					"description": "No Marks",
+					"points": 0,
+					"long_description": "No substantial work, or no attempt to follow conventions"
+				}
+			}
+		},
+		"100": {
+			"description": "Code: HexTileCollection",
+			"long_description": "The main class, fields, invariant, constructors and methods are reasonably defined",
+			"ratings": {
+				"0": {
+					"description": "Full Marks",
+					"long_description": "All methods avoid special cases if possible and do not use 'magic' numbers",
+					"points": 5
+				},
+				"1": {
+					"description": "Most Marks",
+					"long_description": "Some extra cases, or magic numbers",
+					"points": 4
+				},
+				"2": {
+					"description": "Fair",
+					"long_description": "Extra cases *and* magic numbers, or a few incomplete or wrong implementations.",
+					"points": 3
+				},
+				"3": {
+					"description": "Poor",
+					"long_description": "Many places where code is incomplete or clearly wrong",
+					"points": 2
+				},
+				"4": {
+					"description": "Minimal",
+					"long_description": "Substantial work done",
+					"points": 1
+				},
+				"5": {
+					"description": "No Marks",
+					"points": 0
+				}
+			}
+		},
+		"150": {
+			"description": "Code: MyIterator",
+			"long_description": "The iterator: fields, invariant, constructor and methods are reasonably defined",
+			"ratings": {
+				"1": {
+					"description": "Full Marks",
+					"long_description": "All methods avoid special cases if possible and do not use 'magic' numbers",
+					"points": 5
+				},
+				"2": {
+					"description": "Most Marks",
+					"long_description": "Some extra cases, or magic numbers",
+					"points": 4
+				},
+				"3": {
+					"description": "Fair",
+					"long_description": "Extra cases *and* magic numbers, or a few wrong or incomplete methods,",
+					"points": 3
+				},
+				"4": {
+					"description": "Poor",
+					"long_description": "Many places where code is incomplete or clearly wrong",
+					"points": 2
+				},
+				"5": {
+					"description": "Minimal",
+					"long_description": "Substantial work done",
+					"points": 1
+				},
+				"6": {
+					"description": "No Marks",
+					"points": 0.0
+				}
+			}
+		},
+		"200": {
+			"description": "Test: TestHexTileCollection",
+			"long_description": "All tests in TestHexTileCollection pass, score is first numeric failure / 20.  test66 and test9x run before the other tests, but what is needed is the first failure numerically, not temporally.",
+			"ratings": {
+				"0": {
+					"description": "Full Marks",
+					"points": 5.0,
+					"long_description": "All tests pass."
+				},
+				"10": {
+					"description": "test90",
+					"long_description": "First failure is test90",
+					"points": 4.5
+				},
+				"30": {
+					"description": "test70",
+					"long_description": "First failure is test70",
+					"points": 3.5
+				},
+				"34": {
+					"description": "test66",
+					"long_description": "First failure is test66.",
+					"points": 3.3
+				},
+				"50": {
+					"description": "test50",
+					"long_description": "First failure is test50.",
+					"points": 2.5
+				},
+				"60": {
+					"description": "test40",
+					"long_description": "First failure is test40.",
+					"points": 2
+				},
+				"80": {
+					"description": "test20",
+					"long_description": "First failure is test20.",
+					"points": 1
+				},
+				"90": {
+					"description": "No Marks",
+					"long_description": "First failure is test00.",
+					"points": 0
+				}
+			}
+		},
+		"250": {
+			"description": "Code and Run: Demo",
+			"long_description": "The Demo program is changed to use HexTileCollection and runs as expected.",
+			"ratings": {
+				"0": {
+					"description": "Full Marks",
+					"points": 2,
+					"long_description": "All the changes look correct and Demo works as expected."
+				},
+				"1": {
+					"description": "Fair",
+					"points": 1.5,
+					"long_description": "The code doesn't work with general hex tiles, but Demo works as expected on the original sample.hex."
+				},
+				"2": {
+					"description": "Partial Credit",
+					"points": 1,
+					"long_description": "Shows some hexagons when running Demo.."
+				},
+				"3": {
+					"description": "Poor",
+					"points": 0.5,
+					"long_description": "Reads hexagons, but nothing shows up."
+				},				
+				"50": {
+					"description": "No Marks",
+					"points": 0,
+					"long_description": "No good changes."
+				}
+			}
+		},
+		"270": {
+			"description": "Test: TestInvariant",
+			"long_description": "All the tests in TestInvariant pass",
+			"ratings": {
+				"0": {
+					"description": "Full Marks",
+					"points": 1.2,
+					"long_description": "All tests pass."
+				},
+				"1": {
+					"description": "F5",
+					"long_description": "First failure is testF5-9",
+					"points": 1.1
+				},
+				"2": {
+					"description": "F0",
+					"long_description": "First failure is testF0-4",
+					"points": 1.0
+				},
+				"3": {
+					"description": "E5",
+					"long_description": "First failure is testE5-9",
+					"points": 0.9
+				},
+				"4": {
+					"description": "E0",
+					"long_description": "First failure is testE0-4.",
+					"points": 0.8
+				},
+				"5": {
+					"description": "D5",
+					"long_description": "First failure is testD5-9.",
+					"points": 0.7
+				},
+				"6": {
+					"description": "D0",
+					"long_description": "First failure is testD0-D4.",
+					"points": 0.6
+				},
+				"7": {
+					"description": "C5",
+					"long_description": "First failure is testC5-C9.",
+					"points": 0.5
+				},
+				"8": {
+					"description": "C0",
+					"long_description": "First failure is testC0-C4.",
+					"points": 0.4
+				},
+				"9": {
+					"description": "B5",
+					"long_description": "First failure is testB5-B9.",
+					"points": 0.3
+				},
+				"10": {
+					"description": "B0",
+					"long_description": "First failure is testB0-B4.",
+					"points": 0.2
+				},
+				"11": {
+					"description": "A5",
+					"long_description": "First failure is testA5-testA9.",
+					"points": 0.1
+				},
+				"12": {
+					"description": "A0",
+					"long_description": "First failure is testA0-A4",
+					"points": 0
+				}
+			}
+		},
+	 "282":{
+		 "description":"Tests: Efficiency tests",
+		 "long_description":"Efficiency tests all pass, score is first failure / 10.",
+		 "ratings":{
+			 "0":{"description":"Full Marks","points":0.8},
+			 "1":{
+				 "description":"7",
+				 "points":0.7,
+	  			 "long_description":"test0-test6 pass in reasonable time; test7 does not."
+			 },
+			 "2":{
+				 "description":"6",
+				 "points":0.6,
+		   		 "long_description":"test0-test5 pass in reasonable time; test6 does not."
+			 },
+			 "3":{
+				 "description":"5",
+				 "points":0.5,
+				 "long_description":"test0-test4 pass in reasonable time; test5 does not."
+			 },
+			 "4":{
+				 "description":"4",
+				 "points":0.4,
+			 	 "long_description":"test0-test3 pass in reasonable time; test4 does not."
+			 },
+			 "5":{
+				 "description":"3",
+				 "points":0.3,
+			  	 "long_description":"test0-test2 pass in reasonable time; test3 does not."
+			 },
+			 "6":{
+				 "description":"2",
+				 "points":0.2,
+			   	 "long_description":"test0-test1 pass in reasonable time; test2 does not."
+			 },
+			 "7":{
+				 "description":"1",
+				 "points":0.1,
+				 "long_description":"test0 passes in reasonable time; test1 does not."
+			 },
+			 "8":{"description":"No Marks","points":0}}},
+	 "290": {
+		 "description": "Test: Random Tests",
+		 "long_description": "RandomTest runs to completion without finding any failures.",
+		 "ratings": {
+			 "0": {
+				 "description":"Full Marks",
+				 "long_description":"RandomTest passes.  No partial credit",
+				 "points": 1 },
+			 "1": {
+				 "description":"No Marks",
+				 "long_description": "RandomTest yields a test",
+				 "points": 0 }}}
+	 
+ }
+}
