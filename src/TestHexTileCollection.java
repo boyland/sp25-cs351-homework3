@@ -57,7 +57,7 @@ public class TestHexTileCollection extends TestCollection<HexTile> {
 	
 	/// Locked tests
 	
-	public void test() {
+	public void test66() {
 		HexTileCollection bc = new HexTileCollection();
 		// Give the string of the result or name of exception
 		// "it" was never assigned and so it is null; 
