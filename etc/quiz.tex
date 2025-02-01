@@ -12,10 +12,10 @@
 \begin{document}
 \maketitle
 
-In Homework \#3, we implemented a Ball collection with the following data structure:
+In Homework \#3, we implemented a HexTile collection with the following data structure:
 \begin{verbatim}
-public class BallCollection extends AbstractCollection<Ball> {
-    private Ball[ ] data;
+public class HexTileCollection extends AbstractCollection<HexTile> {
+    private HexTile[ ] data;
     private int manyItems;
     private int version;
     
@@ -30,7 +30,7 @@ Add the following new method to the class:
 \begin{verbatim}
 /** Change the size of the collection to match the parameters.
  * If the new size is shorter, elements at the end are lost.
- * If the new size is longer, undefind elemenets (probably null) are added at the end.
+ * If the new size is longer, nulls are added at the end.
  * @param size requested new size
  * @throws IllegalArgumentException if the requested new size is negative
  **/
@@ -43,8 +43,11 @@ public void setSize(int size) {
   if (size < 0) throw new IllegalArgumentException("Cannot set size to " + size);
   ensureCapacity(size);
   if (manyItems != size) ++ version;
+  for (int i=manyItems; i < size; ++i) {
+    data[i] = null;
+  } 
   manyItems = size;
-  assert wellFOrmed() : "invariant broken by setSize";
+  assert wellFormed() : "invariant broken by setSize";
 }
 \end{verbatim}
 \end{solution}
@@ -52,10 +55,10 @@ public void setSize(int size) {
 \newpage
 \maketitle
 
-In Homework \#3, we implemented a Ball collection with the following data structure:
+In Homework \#3, we implemented a HexTile collection with the following data structure:
 \begin{verbatim}
-public class BallCollection extends AbstractCollection<Ball> {
-    private Ball[ ] data;
+public class HexTileCollection extends AbstractCollection<HexTile> {
+    private HexTile[ ] data;
     private int manyItems;
     private int version;
     
@@ -71,7 +74,7 @@ Add the following new method to the class:
 /** Add an element to the beginning of the collection.
  * @param element element to add
  **/
-public void addFront(Ball element) {
+public void addFront(HexTile element) {
     assert wellFormed() : "invariant broken at start of addFront";
     // TODO
 \end{verbatim}
@@ -93,10 +96,10 @@ public void addFront(Ball element) {
 \maketitle
 
 
-In Homework \#3, we implemented a Ball collection with the following data structure:
+In Homework \#3, we implemented a HexTile collection with the following data structure:
 \begin{verbatim}
-public class BallCollection extends AbstractCollection<Ball> {
-    private Ball[ ] data;
+public class HexTileCollection extends AbstractCollection<HexTile> {
+    private HexTile[ ] data;
     private int manyItems;
     private int version;
     
@@ -112,14 +115,14 @@ Add the following new method to the class:
 /** Remove and return the last element in the collection.
  * @throws IllegalStateException if the collection is empty
  **/
-public Ball removeLast() {
+public HexTile removeLast() {
     assert wellFormed() : "invariant broken at start of removeLast";
     // TODO
 \end{verbatim}
 \begin{solution}
 \begin{verbatim}
     if (manyItems == 0) throw new IllegalArgumentException("cannot remove from empty collection");
-    Ball result = data[--manyItems];
+    HexTile result = data[--manyItems];
     ++version;
     assert wellFormed() : "invariant broken at end of removeLast";
     return result;
@@ -130,10 +133,10 @@ public Ball removeLast() {
 \newpage
 \maketitle
 
-In Homework \#3, we implemented a Ball collection with the following data structure:
+In Homework \#3, we implemented a HexTile collection with the following data structure:
 \begin{verbatim}
-public class BallCollection extends AbstractCollection<Ball> {
-    private Ball[ ] data;
+public class HexTileCollection extends AbstractCollection<HexTile> {
+    private HexTile[ ] data;
     private int manyItems;
     private int version;
     
@@ -146,22 +149,25 @@ public class BallCollection extends AbstractCollection<Ball> {
 \end{verbatim}
 Add the following new method to the class:
 \begin{verbatim}
-/** Add all the elements of this collection to the end of itself.
- * If the collection were [b1,b2], then afterwards, it would be [b1,b2,b1,b2].
+/** Replace the entire collection elements with those of the argument
+ * If the collection were [t1,t2], and the argument were [t3,t4,t5]
+ * then afterwards, this collection is [t3,t4,t5].
+ * All iterators are rendered stale if the new collection has a different size
+ * @param c collection to replace with, must not be null
  **/
-public void double() {
+public void replaceAll(Collection<HexTile> c) {
     assert wellFormed() : "invariant broken at start of double";
     // TODO
 \end{verbatim}
 \begin{solution}
 \begin{verbatim}
-    ensureCapacity(manyItems * 2);
-    for (int i=0; i < manyItems; ++i) {
-        data[manyItems+i] = data[i];
+    ensureCapacity(other.manyItems);
+    for (int i=0; i < other.manyItems; ++i) {
+        data[i] = other.data[i];
     }
-    if (manyItems > 0) ++version;
-    manyItems *= 2;
-    assert wellFormed() : "invariant broken by double";
+    if (manyItems != other.manyItems) ++version;
+    manyItems = other.manyItems;
+    assert wellFormed() : "invariant broken by replaceAll";
 }
 \end{verbatim}
 \end{solution}
