@@ -609,9 +609,15 @@ make sure to commit (and push if possible) your code.
   is time to check efficiency.
   
 \item Test that your algorithms are efficient with
-  \texttt{TestEfficiency}.  Most people's code will fail at least one, the
-  first time the test is run.  Fix the code so that passes efficiency
-  testing.
+  \texttt{TestEfficiency}.  You will need to \emph{remove}
+  \texttt{-ea} from the ``VM Arguments'' in order to run
+  efficiency tests.  We don't want to spend time checking the data
+  structure, but rather to use the information that the data structure
+  provides for efficient operation.
+
+  Most people's code will fail at least one test, the
+  first time the test suite is run.  Fix the code so that passes efficiency
+  testing.  See the hints section (Section~\ref{sec:hints}) below.
 
 \item Then re-run \texttt{TestHexTileCollection} and random testing to
   make sure that you didn't mess up
@@ -626,7 +632,7 @@ make sure to commit (and push if possible) your code.
   collection ADT to accomplish some non-trivial tasks.
 \end{enumerate}  
 
-\section{Hints}
+\section{Hints}\label{sec:hints}
 
 New to this homework assignment are efficiency tests.
 Efficiency tests often fail in different ways than normal tests.  Of

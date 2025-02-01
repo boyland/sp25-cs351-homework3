@@ -66,7 +66,7 @@ public class TestHexTileCollection extends TestCollection<HexTile> {
 		assertEqualsOrException(Ts(12763851),() -> it.hasNext());
 		assertEqualsOrException(Ts(775338767),() -> it.next());
 		bc.add(e[1]); // added a HexTile LAND<1,1,0>
-		assertEqualsOrException(Ts(268544907),() -> it.hasNext());
+		assertEqualsOrException(Ts(268544907),() -> it.hasNext()); // when was it initialized?
 		it = bc.iterator();
 		assertEqualsOrException(Ts(1125408703),() -> it.hasNext());
 		assertEqualsOrException(Ts(1106512103), () -> it.next());
