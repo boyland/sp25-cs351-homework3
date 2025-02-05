@@ -72,6 +72,48 @@ public class TestHexTileCollection extends TestCollection<HexTile> {
 		assertEqualsOrException(Ts(1106512103), () -> it.next());
 	}
 	
+	
+	/// clone tests
+	
+	public void test67() {
+		HexTileCollection hc = new HexTileCollection();
+		hc.add(e[1]);
+		hc.add(e[2]);
+		HexTileCollection c = hc.clone();
+		hc.add(e[3]);
+		c.add(e[4]);
+		it = hc.iterator();
+		assertSame(e[1], it.next());
+		assertSame(e[2], it.next());
+		assertSame(e[3], it.next());
+		assertFalse(it.hasNext());
+		it = c.iterator();
+		assertSame(e[1], it.next());
+		assertSame(e[2], it.next());
+		assertSame(e[4], it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	public void test69() {
+		// If your code fails this test, check that you
+		// are following the "clone" idiom in the textbook.
+		class MyHexTileCollection extends HexTileCollection {
+			MyHexTileCollection(boolean ignored) {
+				super();
+				assert it != null :"Should not use constructor!";
+			}
+		}
+		it = c.iterator();
+		HexTileCollection hc = new MyHexTileCollection(true);
+		hc.add(e[3]);
+		it = null; // make sure that the clone code doesn't deviously call constructor
+		HexTileCollection c = hc.clone();
+		assertTrue("Didn't follow clone pattern!", c instanceof MyHexTileCollection);
+		assertSame(e[3], c.iterator().next());
+
+	}
+	
+	
 	/// HexTile tests:
 	
 	public void test90() {
