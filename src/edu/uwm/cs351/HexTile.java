@@ -62,13 +62,24 @@ public class HexTile {
 	public HexCoordinate getLocation() { return location; }
 
 	/**
-	 * Render the tile in a graphics context.
+	 * Render the tile in a graphics context with default width.
 	 * We fill the hexagon with the terrain suggested color and then
 	 * outline the tile in black.
 	 * @param g context to use.
 	 */
 	public void draw(Graphics g) {
-		Polygon hexagon = location.toPolygon(WIDTH);
+		draw(g, WIDTH);
+	}
+
+	/**
+	 * Render the tile in a graphics context.
+	 * We fill the hexagon with the terrain suggested color and then
+	 * outline the tile in black.
+	 * @param g context to use.
+	 * @para, width width to use
+	 */
+	public void draw(Graphics g, int width) {
+		Polygon hexagon = location.toPolygon(width);
 		g.setColor(terrain.getColor());
 		g.fillPolygon(hexagon);
 		g.setColor(Color.BLACK);
